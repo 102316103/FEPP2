@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomgroupExtMapper">
+	<select id="queryGroupIdByNo" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT GROUPID
+		FROM SYSCOMGROUP
+		<where>
+			<if test="groupno != null and groupno != ''">
+				AND RTRIM(GROUPNO) = #{groupno}
+			</if>
+		</where>
+		ORDER BY GROUPID
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	<resultMap id="GroupCultureResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomgroupAndCulture">
+		<id property="groupid" column="GROUPID" javaType="java.lang.Integer" />
+		<result property="groupno" column="GROUPNO" javaType="java.lang.String" />
+		<result property="locationno" column="LOCATIONNO" javaType="java.lang.Integer" />
+		<result property="groupurl" column="GROUPURL" javaType="java.lang.String" />
+		<result property="effectdate" column="EFFECTDATE" javaType="java.util.Date" />
+		<result property="expireddate" column="EXPIREDDATE" javaType="java.util.Date" />
+		<result property="updateuserid" column="UPDATEUSERID" javaType="java.lang.Integer" />
+		<result property="updatetime" column="UPDATETIME" javaType="java.util.Date" />
+		<result property="culture" column="CULTURE" javaType="java.lang.String" />
+		<result property="groupname" column="GROUPNAME" javaType="java.lang.String" />
+		<result property="remark" column="REMARK" javaType="java.lang.String" />
+	</resultMap>
+	<select id="queryAllGroups" parameterType="com.syscom.safeaa.mybatis.vo.SyscomgroupAndCulture" resultMap="GroupCultureResultMap">
+		SELECT a.GROUPID, a.GROUPNO,a.LocationNo, a.GroupURL As GroupURL, a.EffectDate, a.ExpiredDate,NVL(a.UpdateUserId,0) As UpdateUserId, a.UpdateTime,
+		cul.Culture, cul.GROUPNAME, cul.Remark
+		FROM SyscomGroup a, SyscomGroupCulture cul
+		<where>
+			a.GroupId = cul.GroupId AND (cul.CULTURE IS NULL
+			<if test="culture != null and culture != ''">
+				OR cul.CULTURE = #{culture}
+			</if>
+			)
+			<if test="groupid != null ">
+				AND a.GROUPID = #{groupid}
+			</if>
+			<if test="groupno != null and groupno != ''">
+				AND RTRIM(a.GROUPNO) = #{groupno}
+			</if>
+			<if test="groupname != null and groupname != ''">
+				AND cul.GROUPNAME like '%'|| #{groupname} ||'%'
+			</if>
+		</where>
+	</select>
+	<select id="queryAllExcludeGroups" parameterType="map" resultMap="GroupCultureResultMap">
+		SELECT a.GroupId, a.GroupNo, a.LocationNo, a.GroupURL As GroupURL, a.EffectDate, a.ExpiredDate, NVL(a.UpdateUserId,0) As UpdateUserId, a.UpdateTime,
+		cul.Culture As Culture, cul.GroupName As GroupName, cul.Remark As Remark FROM SyscomGroup a
+		,SyscomGroupCulture cul WHERE a.GroupId = cul.GroupId(+) AND (cul.Culture is null or cul.Culture = #{culture})
+		and a.GroupNo !=#{groupno}
+	</select>
+	<resultMap id="SyscomgroupInfoVoResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomgroupInfoVo">
+		<id property="pid" column="RESOURCEPID" />
+		<result property="id" column="RESOURCEID" />
+		<result property="no" column="RESOURCEPNO" />
+		<result property="name" column="RESOURCENAME" />
+		<result property="url" column="RESOURCEURL" />
+		<result property="locationno" column="LOCATIONNO" />
+		<result property="effectdate" column="EFFECTDATE" />
+		<result property="expireddate" column="EXPIREDDATE" />
+		<result property="type" column="TYPE" />
+	</resultMap>
+	<select id="getSyscomgroupInfoVoAll" resultMap="SyscomgroupInfoVoResultMap">
+		SELECT * FROM (
+		SELECT
+		- 1 AS RESOURCEPID, -- PID
+		0 RESOURCEID, -- ID
+		NULL AS RESOURCEPNO, -- 編號
+		'root' RESOURCENAME, -- 名稱
+		NULL AS RESOURCEURL, -- URL
+		NULL AS LOCATIONNO, -- 位置
+		NULL AS EFFECTDATE, -- 生效日
+		NULL AS EXPIREDDATE, -- 失效日
+		'T' AS TYPE
+		FROM SYSIBM.SYSDUMMY1
+		UNION
+		SELECT
+		0 AS RESOURCEPID, -- PID
+		SG.GROUPID AS RESOURCEID, -- ID
+		SG.GROUPNO AS RESOURCEPNO, -- 編號
+		SGC.GROUPNAME AS RESOURCENAME, -- 名稱
+		SG.GROUPURL AS RESOURCEURL, -- URL
+		SG.LOCATIONNO, -- 位置
+		TO_CHAR(SG.EFFECTDATE,'yyyy-MM-dd') AS EFFECTDATE, -- 生效日
+		TO_CHAR(SG.EXPIREDDATE,'yyyy-MM-dd') AS EXPIREDDATE, -- 失效日
+		'G' AS TYPE
+		FROM SYSCOMGROUP SG
+		LEFT JOIN SYSCOMGROUPCULTURE SGC ON SGC.GROUPID = SG.GROUPID
+		WHERE NOT SG.GROUPID IS NULL
+		AND NOT EXISTS (SELECT 1 FROM SYSCOMGROUPMEMBERS SGM WHERE SGM.CHILDID =SG.GROUPID)
+		UNION
+		SELECT
+		SGM.GROUPID AS RESOURCEPID, -- PID
+		SGM.CHILDID AS RESOURCEID, -- ID
+		SG.GROUPNO AS RESOURCEPNO, -- 編號
+		SGC.GROUPNAME AS RESOURCENAME, -- 名稱
+		SG.GROUPURL AS RESOURCEURL, -- URL
+		SG.LOCATIONNO, -- 位置
+		TO_CHAR(SG.EFFECTDATE,'yyyy-MM-dd') AS EFFECTDATE, -- 生效日
+		TO_CHAR(SG.EXPIREDDATE,'yyyy-MM-dd') AS EXPIREDDATE, -- 失效日
+		SGM.CHILDTYPE AS TYPE
+		FROM SYSCOMGROUPMEMBERS SGM
+		LEFT JOIN SYSCOMGROUP SG ON SG.GROUPID = SGM.CHILDID
+		LEFT JOIN SYSCOMGROUPCULTURE SGC ON SGC.GROUPID = SGM.CHILDID
+		WHERE SGM.CHILDTYPE ='G'
+		UNION
+		SELECT
+		SGM.GROUPID AS RESOURCEPID, -- PID
+		SS.RESOURCEID, -- ID
+		SS.RESOURCENO, -- 編號
+		SGC.RESOURCENAME, -- 名稱
+		SS.RESOURCEURL, -- URL
+		SGM.LOCATIONNO, -- 位置
+		TO_CHAR(SS.EFFECTDATE,'yyyy-MM-dd') AS EFFECTDATE, -- 生效日
+		TO_CHAR(SS.EXPIREDDATE,'yyyy-MM-dd') AS EXPIREDDATE, -- 失效日
+		'R' AS TYPE
+		FROM SYSCOMGROUPMEMBERS SGM
+		LEFT JOIN SYSCOMRESOURCE SS ON SS.RESOURCEID = SGM.CHILDID
+		LEFT JOIN SYSCOMRESOURCECULTURE SGC ON SGC.RESOURCEID = SS.RESOURCEID
+		WHERE NOT SS.RESOURCEID IS NULL
+		) ORDER BY RESOURCEPID,LOCATIONNO
+	</select>
+	<select id="getMaxLocationno" resultType="java.lang.Integer">
+		SELECT MAX(LOCATIONNO) FROM SYSCOMGROUP
+	</select>
+</mapper>

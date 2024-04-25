@@ -1,0 +1,7 @@
+/.idea
+/fep-enclib/*.classpath
+/fep-enclib/*.project
+/fep-enclib/.settings
+/fep-enclib/*.iml
+/fep-enclib/target
+.dbeaver

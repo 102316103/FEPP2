@@ -1,0 +1,33 @@
+/bin/
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+*.ser
+*.ec
+
+# IntelliJ Idea
+.idea/
+out/
+*.ipr
+*.iws
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+# maven ignore
+target
+
+# other ignore
+*.log
+*.tmp
+Thumbs.db
+*.DS_Store
+.factorypath
+

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{home}">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body>
+	<div layout:fragment="panel-condition" class="panel-hidden">
+		<form id="form-validator" th:action="@{/atmmon/UI_060550/inquiryFeplogList}" method="post" th:if="${detailMap!=null}">
+			<input type="hidden" name="feptxnEjfno" th:value="${detailMap.get('FEPTXN_EJFNO')}">
+			<input type="hidden" name="feptxnTraceEjfno" th:value="${detailMap.get('FEPTXN_TRACE_EJFNO')}">
+			<input type="hidden" name="feptxnPcode" th:value="${detailMap.get('FEPTXN_PCODE')}">
+			<input type="hidden" name="feptxnMsgid" th:value="${detailMap.get('FEPTXN_MSGID')}">
+			<input type="hidden" name="feptxnTxDate" th:value="${detailMap.get('FEPTXN_TX_DATE')}">
+			<input type="hidden" name="feptxnSubsys" th:value="${detailMap.get('FEPTXN_SUBSYS')}">
+		</form>
+	</div>
+	<div layout:fragment="panel-button">
+		<button type="button" class="btn btn-primary" id="btnQuery" th:if="${detailMap!=null}">查詢</button>
+		<button type="button" class="btn btn-primary" id="btnPrevPage">上一頁</button>
+	</div>
+	<div layout:fragment="panel-summary" class="panel-hidden"></div>
+	<div layout:fragment="panel-grid" class="panel-detail">
+		<table border="0" cellspacing="0" class="table-detail">
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">交易日期</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).charDateToDate(detailMap.get('FEPTXN_TX_DATE'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">電子日誌序號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_EJFNO')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TRACE_EJFNO')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">ATM代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATMNO')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">ATM/ATM CON交易序號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATM_SEQNO')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}"
+								th:text="${T(com.syscom.fep.web.base.FEPWebBase).join('-', detailMap.get('FEPTXN_CON_ATM_SEQNO1'), detailMap.get('FEPTXN_CON_ATM_SEQNO2'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">交易序號/確認中心交易序號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TXSEQ')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CON_TXSEQ')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">ATM/ATM CON交易代號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TX_CODE')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CON_TX_CODE')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">財金交易代號(PCODE)</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}"
+						th:text="${T(com.syscom.fep.web.base.FEPWebBase).isPcodeShowed(detailMap.get('FEPTXN_FISC_FLAG'), detailMap.get('FEPTXN_PCODE'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">通道別</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CHANNEL')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">財金營業日</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).charDateToDate(detailMap.get('FEPTXN_TBSDY_FISC'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">財金STAN</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).join('-', detailMap.get('FEPTXN_BKNO'), detailMap.get('FEPTXN_STAN'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">本行營業日</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).charDateToDate(detailMap.get('FEPTXN_TBSDY'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">交易時間/確認時間</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).charTimeToTime(detailMap.get('FEPTXN_TX_TIME'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).charTimeToTime(detailMap.get('FEPTXN_CON_TX_TIME'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">軋帳時點</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATMOD')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">發卡區T24序號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CBS_RRN')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">端末設備型態</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATM_TYPE')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">交易區T24序號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_VIR_CBS_RRN')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">虛擬櫃員機代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATMNO_VIR')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">虛擬中心交易序號/CON交易序號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_VIR_TXSEQ')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CON_VIR_TXSEQ')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">訊息代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_MSGID')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">績效單位(轉出/轉入)</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_DEPT')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TRIN_DEPT')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr class="tr-gap" />
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">卡片帳號</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_MAJOR_ACTNO')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CARD_SEQ')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">轉出銀行_轉出帳號_類別_多幣卡</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}"
+								th:text="${T(com.syscom.fep.web.base.FEPWebBase).join('-', detailMap.get('FEPTXN_TROUT_BKNO'), detailMap.get('FEPTXN_TROUT_ACTNO'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TROUT_KIND')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_MULTICUR')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">轉入銀行_轉入帳號_類別</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}"
+								th:text="${T(com.syscom.fep.web.base.FEPWebBase).join('-', detailMap.get('FEPTXN_TRIN_BKNO'), detailMap.get('FEPTXN_TRIN_ACTNO'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">/</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TRIN_KIND')}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">實際入帳帳號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TRIN_ACTNO_ACTUAL')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">提領幣別</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TX_CUR')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">提領金額</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_AMT'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">帳戶幣別</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TX_CUR_ACT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">帳戶交易金額</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_AMT_ACT'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">手續費幣別</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_FEE_CUR')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">提領當地手續費</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_FEE_CUSTPAY'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">手續費折算原幣金額</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_FEE_CUSTPAY_ACT'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">小額跨轉優惠記號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_BENEFIT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">應收財金手續費</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_FEE_DR'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">應付財金手續費</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_FEE_CR'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">應收同業手續費</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_FEE_MBNK_DR'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">應付同業手續費</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_TX_FEE_MBNK_CR'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">可用餘額</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_BALA'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">帳戶餘額</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${#numbers.formatDecimal(detailMap.get('FEPTXN_BALB'),1,'COMMA',2,'POINT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">CBS摘要</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CBS_DSCPT')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">ATMC檔交易代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TX_CODE_ATMC')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">帳務分行</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_BRNO')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">地區代碼</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ZONE_CODE')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">ATM所屬區域</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATM_ZONE')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">ATM所屬分行</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ATM_BRNO')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">IC卡交易序號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_IC_SEQNO')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">IC卡備註欄</label>
+				</td>
+				<td class="condition-input">
+					<textarea class="form-control" rows="1" readonly="readonly" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ICMARK')}"></textarea>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr class="tr-gap" />
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">交易處理結果</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_TXRUST')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">記帳類別</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).getTypeName(detailMap.get('FEPTXN_ACC_TYPE'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">財金回應代號REQ-REP-CON</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_REQ_RC'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_REP_RC'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_CON_RC'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">ATM回應代號REQ-REP-CON-CONR</label>
+				</td>
+				<td class="condition-input">
+					<div class="row">
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_EXCP_CODE'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_REPLY_CODE'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_CON_EXCP_CODE'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+						<label class="label-text-symbol">-</label>
+						<div class="col">
+							<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_CON_REPLY_CODE'))}"></label>
+							<label class="form-control" th:if="${detailMap==null}"></label>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">發卡區CBS回應代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_CBS_RC'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-input" colspan="2">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ERR_MSG')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">交易區CBS回應代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).formatExpCd(detailMap.get('FEPTXN_VIR_CBS_RC'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-input" colspan="2">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_VIR_ERR_MSG')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">AA回應代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).mapMsgFromAaRc(detailMap.get('FEPTXN_AA_RC'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">信用卡主機回應代號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_ASC_RC')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">CBS/信用卡主機/FISC逾時記號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).toBoolean(detailMap.get('FEPTXN_CBS_TIMEOUT'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).toBoolean(detailMap.get('FEPTXN_ASC_TIMEOUT'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).toBoolean(detailMap.get('FEPTXN_FISC_TIMEOUT'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">PENDING記號</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_PENDING')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">中文附言欄</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CHREM')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<span>(資金用途給對方)</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">訊息流程</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${T(com.syscom.fep.web.base.FEPWebBase).getMsgFlowName(detailMap.get('FEPTXN_MSGFLOW'))}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<label class="col-form-label">轉出附言欄</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_FMREM')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+				<td class="condition-label">
+					<span>(資金用途給自己)</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="condition-label">
+					<label class="col-form-label">外圍使用者端訊息追蹤識別碼</label>
+				</td>
+				<td class="condition-input">
+					<label class="form-control label-text-left" th:if="${detailMap!=null}" th:text="${detailMap.get('FEPTXN_CHANNEL_EJFNO')}"></label>
+					<label class="form-control" th:if="${detailMap==null}"></label>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div layout:fragment="panel-script">
+		<script type="text/javascript" th:src="@{/js/atmmon/UI060550_Detail.js}"></script>
+	</div>
+</body>
+</html>

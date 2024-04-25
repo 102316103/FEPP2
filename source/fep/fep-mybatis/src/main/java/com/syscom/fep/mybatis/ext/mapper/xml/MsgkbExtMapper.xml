@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.fep.mybatis.ext.mapper.MsgkbExtMapper">
+    <!--
+        author: Chenyu
+        Time: 2021/11/18
+      -->
+
+    <select id="getDataTableByPrimaryKey" resultMap="com.syscom.fep.mybatis.mapper.MsgkbMapper.BaseResultMap">
+        SELECT * FROM MSGKB
+        <where>
+            <if test="errorcode != null and errorcode != ''">
+                AND ERRORCODE = #{errorcode,jdbcType=VARCHAR}
+            </if>
+            <if test="externalcode != null and externalcode != ''">
+                AND EXTERNALCODE = #{externalcode,jdbcType=VARCHAR}
+            </if>
+            <if test="exsubcode != null and exsubcode != ''">
+                AND EXSUBCODE = #{exsubcode,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="getMSGKB" parameterType="map" resultMap="com.syscom.fep.mybatis.mapper.MsgkbMapper.BaseResultMap">
+        SELECT * FROM MSGKB
+        WHERE ERRORCODE = #{errcode,jdbcType=VARCHAR}
+        AND EXSUBCODE = #{exSubCode,jdbcType=VARCHAR}
+    </select>
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomroleExtMapper">
+	<resultMap id="SyscomroleInfoVoResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomroleInfoVo">
+		<id property="pid" column="PID" />
+		<result property="id" column="ID" />
+		<result property="no" column="NO" />
+		<result property="name" column="NAME" />
+		<result property="empid" column="EMPID" />
+		<result property="emailaddress" column="EMAILADDRESS" />
+		<result property="effectdate" column="EFFECTDATE" />
+		<result property="expireddate" column="EXPIREDDATE" />
+		<result property="type" column="TYPE" />
+	</resultMap>
+	<resultMap id="RoleWithCultureResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomroleAndCulture">
+		<id property="roleid" column="ROLEID" />
+		<result property="roleno" column="ROLENO" />
+		<result property="roletype" column="ROLETYPE" />
+		<result property="effectdate" column="EFFECTDATE" />
+		<result property="expireddate" column="EXPIREDDATE" />
+		<result property="updateuserid" column="UPDATEUSERID" />
+		<result property="updatetime" column="UPDATETIME" />
+		<result property="culture" column="CULTURE" />
+		<result property="rolename" column="ROLENAME" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+	<resultMap id="SyscomroleResourceVoResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomroleResourceVo">
+		<result property="roleid" column="ROLEID" />
+		<result property="roleno" column="ROLENO" />
+		<result property="rolename" column="ROLENAME" />
+		<result property="resourcepid" column="RESOURCEPID" />
+		<result property="resourcepno" column="RESOURCEPNO" />
+		<result property="resourceid" column="RESOURCEID" />
+		<result property="resourcename" column="RESOURCENAME" />
+		<result property="resourceurl" column="RESOURCEURL" />
+		<result property="locationnog" column="LOCATIONNOG" />
+		<result property="locationnor" column="LOCATIONNOR" />
+	</resultMap>
+	<select id="queryAllRoles" parameterType="com.syscom.safeaa.mybatis.vo.SyscomroleAndCulture" resultMap="RoleWithCultureResultMap">
+		select
+		a.ROLEID, a.ROLENO, a.ROLETYPE,a.EFFECTDATE,a.EXPIREDDATE,a.UPDATEUSERID,a.UPDATETIME,
+		cul.CULTURE, cul.ROLENAME, cul.REMARK
+		from SYSCOMROLE a
+		left join SYSCOMROLECULTURE cul
+		on cul.ROLEID = a.ROLEID
+		where cul.CULTURE= #{culture}
+		<if test="roleid != null ">
+			AND a.ROLEID = #{roleid}
+		</if>
+		<if test="rolename != null and rolename != ''">
+			AND cul.ROLENAME like '%'|| #{rolename} ||'%'
+		</if>
+		<if test="roleno != null and roleno != ''">
+			AND RTRIM(a.ROLENO) =#{roleno}
+		</if>
+	</select>
+	<select id="queryRoleIdByNo" parameterType="String" resultType="Integer">
+		SELECT ROLEID
+		FROM SYSCOMROLE
+		<where>
+			<if test="roleno != null and roleno != ''">
+				AND RTRIM(ROLENO) = #{roleno}
+			</if>
+		</where>
+		ORDER BY ROLEID
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	<select id="getSyscomroleInfoVoAll" resultMap="SyscomroleInfoVoResultMap">
+		SELECT
+		- 1 AS PID,
+		0 ID,
+		NULL AS NO,
+		'root' NAME,
+		NULL AS EMPID,
+		NULL AS EMAILADDRESS,
+		NULL AS EFFECTDATE,
+		NULL AS EXPIREDDATE,
+		'T' AS TYPE
+		FROM SYSIBM.SYSDUMMY1
+		UNION
+		SELECT
+		0 AS PID, -- PID
+		SR.ROLEID AS ID, -- ID
+		SR.ROLENO AS NO, -- 編號
+		SRC.ROLENAME AS NAME, -- 名稱
+		NULL AS EMPID,
+		NULL AS EMAILADDRESS, -- URL
+		TO_CHAR(SR.EFFECTDATE,'yyyy-MM-dd') AS EFFECTDATE, -- 生效日
+		TO_CHAR(SR.EXPIREDDATE,'yyyy-MM-dd') AS EXPIREDDATE, -- 失效日
+		'R' AS TYPE
+		FROM SYSCOMROLE SR
+		LEFT JOIN SYSCOMROLECULTURE SRC ON SRC.ROLEID = SR.ROLEID
+		WHERE NOT SR.ROLEID IS NULL
+		UNION
+		SELECT
+		SRM.ROLEID AS PID,
+		SRM.CHILDID AS ID,
+		SU.LOGONID AS NO,
+		SU.USERNAME AS NAME,
+		SU.EMPID,
+		SU.EMAILADDRESS,
+		TO_CHAR(SU.EFFECTDATE,'yyyy-MM-dd') AS EFFECTDATE, -- 生效日
+		TO_CHAR(SU.EXPIREDDATE,'yyyy-MM-dd') AS EXPIREDDATE, -- 失效日
+		SRM.CHILDTYPE AS TYPE
+		FROM SYSCOMROLEMEMBERS SRM
+		LEFT JOIN SYSCOMUSER SU ON SU.USERID = SRM.CHILDID
+		WHERE NOT SU.USERID IS NULL
+	</select>
+	<select id="queryMenuListByRoles" parameterType="map" resultMap="SyscomroleResourceVoResultMap">
+		SELECT * FROM (
+		SELECT
+		RO.ROLEID, -- 角色ID
+		RO.ROLENO, -- 角色代號
+		SRC.ROLENAME, -- 角色名
+		0 AS RESOURCEPID, -- MENU父ID
+		NULL AS RESOURCEPNO, -- MENUNO
+		SRG.GROUPID AS RESOURCEID, -- MENUID
+		SGC.GROUPNAME AS RESOURCENAME, -- MENU名
+		SG.GROUPURL AS RESOURCEURL, -- MENUURL
+		SG.LOCATIONNO AS LOCATIONNOG ,
+		0 AS LOCATIONNOR
+		FROM  SYSCOMROLE RO
+		LEFT JOIN SYSCOMROLECULTURE SRC ON SRC.ROLEID = RO.ROLEID
+		LEFT JOIN SYSCOMROLEGROUP SRG ON SRG.ROLEID = RO.ROLEID
+		LEFT JOIN SYSCOMGROUP SG ON SG.GROUPID = SRG.GROUPID
+		LEFT JOIN SYSCOMGROUPCULTURE SGC ON SGC.GROUPID = SRG.GROUPID
+		<where>
+			<if test="roles != null and roles != '' ">
+				RO.ROLENO IN
+				<foreach collection="roles" item="role" index="index" open="(" close=")" separator=",">
+					#{role}
+				</foreach>
+			</if>
+		</where>
+		UNION
+		SELECT
+		RO.ROLEID, -- 角色ID
+		RO.ROLENO, -- 角色代號
+		SRC.ROLENAME, -- 角色名
+		SGM.GROUPID AS RESOURCEPID, -- MENU父ID
+		SS.RESOURCENO, -- MENUNO
+		SRR.RESOURCEID , -- MENUID
+		SGC.RESOURCENAME , -- MENU名
+		SS.RESOURCEURL, -- MENUURL
+		99999 AS LOCATIONNOG,
+		SGM.LOCATIONNO AS LOCATIONNOR
+		FROM SYSCOMROLE RO
+		LEFT JOIN SYSCOMROLECULTURE SRC ON SRC.ROLEID = RO.ROLEID
+		LEFT JOIN SYSCOMROLERESOURCE SRR ON SRR.ROLEID = RO.ROLEID
+		LEFT JOIN SYSCOMRESOURCE SS ON SS.RESOURCEID = SRR.RESOURCEID
+		LEFT JOIN SYSCOMRESOURCECULTURE SGC ON SGC.RESOURCEID = SRR.RESOURCEID
+		LEFT JOIN SYSCOMGROUPMEMBERS SGM ON SGM.CHILDID = SRR.RESOURCEID
+		<where>
+			<if test="roles != null and roles != '' ">
+				RO.ROLENO IN
+				<foreach collection="roles" item="role" index="index" open="(" close=")" separator=",">
+					#{role}
+				</foreach>
+			</if>
+		</where>
+		)
+		ORDER BY LOCATIONNOG, LOCATIONNOR
+	</select>
+</mapper>

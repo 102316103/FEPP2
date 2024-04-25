@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomuserdeputyExtMapper">
+	<resultMap id="SyscomQueryAllUserDeputyVo" type="com.syscom.safeaa.mybatis.vo.SyscomQueryAllUserDeputyVo">
+		<result column="UserId" property="UserId" />
+		<result column="LogOnId" property="LogOnId" />
+		<result column="UserName" property="UserName" />
+		<result column="DeputyUserId" property="DeputyUserId" />
+		<result column="DeputyLogOnId" property="DeputyLogOnId" />
+		<result column="DeputyUserName" property="DeputyUserName" />
+		<result column="RoleId" property="RoleId" />
+		<result column="RoleNo" property="RoleNo" />
+		<result column="RoleType" property="RoleType" />
+		<result column="EffectDate" property="EffectDate" />
+		<result column="ExpiredDate" property="ExpiredDate" />
+		<result column="Culture" property="Culture" />
+		<result column="RoleName" property="RoleName" />
+		<result column="EmployeeId" property="EmployeeId" />
+	</resultMap>
+	<resultMap id="SyscomRoleMembersVo" type="com.syscom.safeaa.mybatis.vo.SyscomRoleMembersVo">
+		<result column="roleno" property="roleno" />
+		<result column="rolename" property="rolename" />
+		<result column="roleid" property="roleid" />
+	</resultMap>
+	<resultMap id="SyscomUNSelectUserDeputy" type="com.syscom.safeaa.mybatis.vo.SyscomUNSelectUserDeputyByUserIdVo">
+		<result column="UserId" property="UserId" />
+		<result column="LogOnId" property="LogOnId" />
+		<result column="UserName" property="UserName" />
+		<result column="EffectDate" property="EffectDate" />
+		<result column="ExpiredDate" property="ExpiredDate" />
+	</resultMap>
+	<delete id="deleteAllByUserId" parameterType="map">
+		delete from SYSCOMUSERDEPUTY
+		where 1=1
+		<if test="userId != null">
+			and USERID = #{userId,jdbcType=DECIMAL}
+		</if>
+		<if test="roleId != null">
+			and ROLEID = #{roleId,jdbcType=DECIMAL}
+		</if>
+	</delete>
+	<select id="queryAllUserDeputy" parameterType="map" resultMap="SyscomQueryAllUserDeputyVo">
+		SELECT
+		ud.UserId,
+		u.LogOnId,
+		u.UserName,
+		ud.DeputyUserId,
+		SyscomUser_1.LogOnId AS DeputyLogOnId,
+		SyscomUser_1.UserName AS DeputyUserName,
+		r.RoleId,
+		r.RoleNo,
+		r.RoleType,
+		ud.EffectDate,
+		ud.ExpiredDate,
+		rc.Culture,
+		rc.RoleName,
+		u.EmployeeId
+		FROM
+		SyscomUserDeputy ud
+		INNER JOIN SyscomUser u ON ud.UserId = u.UserId
+		INNER JOIN SyscomUser SyscomUser_1 ON ud.DeputyUserId = SyscomUser_1.UserId
+		INNER JOIN SyscomRole r ON ud.RoleId = r.RoleId
+		INNER JOIN SyscomRoleCulture rc ON r.RoleId = rc.RoleId
+		WHERE 1 = 1
+		<if test="userId != null">
+			and ud.USERID = #{userId,jdbcType=DECIMAL}
+		</if>
+		<if test="roleId != null">
+			and r.ROLEID = #{roleId,jdbcType=DECIMAL}
+		</if>
+		<if test="@com.syscom.safeaa.utils.DbHelper@isSqlInOrderByValid(orderBy)">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	<select id="queryParentRolesByUserId" parameterType="map" resultMap="SyscomRoleMembersVo">
+		SELECT DISTINCT r.RoleNo, rc.RoleName, dr.RoleId
+		FROM (SELECT RoleId, ChildId, childtype
+		FROM SyscomRoleMembers
+		WHERE ChildId = #{userId,jdbcType=DECIMAL} AND ChildType = 'U'
+		UNION ALL
+		SELECT RoleId, ChildId, childtype FROM
+		(
+			WITH RPL (RoleId, ChildId, childtype,EffectDate,ExpiredDate) AS (
+				SELECT RoleId, ChildId, childtype,EffectDate,ExpiredDate
+				FROM SyscomRoleMembers WHERE ChildType = 'U' AND ChildId = #{userId,jdbcType=DECIMAL}
+				UNION ALL 
+				SELECT CHILD.RoleId, CHILD.ChildId, CHILD.childtype,CHILD.EffectDate,CHILD.ExpiredDate
+				FROM RPL PARENT, SyscomRoleMembers CHILD
+				WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL
+		)
+		WHERE ChildType = 'R' AND SYSDATE BETWEEN EffectDate AND ExpiredDate ) dr,
+		SyscomRole r,
+		SyscomRoleCulture rc
+		WHERE dr.RoleId = r.RoleId AND SYSDATE BETWEEN r.EffectDate AND r.ExpiredDate
+		AND dr.RoleId = rc.RoleId AND rc.Culture = #{culture,jdbcType=VARCHAR}
+	</select>
+	<select id="queryUNSelectUserDeputyByUserId" parameterType="map" resultMap="SyscomUNSelectUserDeputy">
+		SELECT
+		a.UserId,
+		a.LogOnId,
+		a.UserName,
+		a.EffectDate,
+		a.ExpiredDate
+		FROM
+		SyscomUser a LEFT JOIN SyscomUserDeputy c ON a.UserId = c.DeputyUserId
+		AND ( c.UserId IS NULL OR c.UserId = #{userId} )
+		AND ( c.RoleId IS NULL OR c.RoleId = #{roleId} )
+		AND ( c.UserId IS NULL )
+		AND ( a.UserId != #{userId} )
+		AND ( SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate )
+	</select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomuserstatusExtMapper">
+	<resultMap id="SyscomQueryAllUsersResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomQueryAllUsers">
+		<result column="UserId" property="UserId" javaType="java.lang.Integer" jdbcType="INTEGER" />
+		<result column="LogonId" property="LogonId" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="UserName" property="UserName" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="EmployeeId" property="EmployeeId" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="IDNO" property="IDNO" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="Birthday" property="Birthday" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="EffectDate" property="EffectDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="ExpiredDate" property="ExpiredDate" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="EmailAddress" property="EmailAddress" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="UpdateUserId" property="UpdateUserId" javaType="java.lang.Integer" jdbcType="INTEGER" />
+		<result column="UpdateTime" property="UpdateTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="LogOnTime" property="LogOnTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="LogOnIP" property="LogOnIP" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="IsLogOn" property="IsLogOn" javaType="java.lang.Short" jdbcType="SMALLINT" />
+		<result column="LogOnChangeSscode" property="LogOnChangeSscode" javaType="java.lang.Short" jdbcType="SMALLINT" />
+		<result column="LastSscodeChangeTime" property="LastSscodeChangeTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="SscodeErrorCount" property="SscodeErrorCount" javaType="java.lang.Integer" jdbcType="INTEGER" />
+		<result column="LastLogOnTime" property="LastLogOnTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="LastLogOnIP" property="LastLogOnIP" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="LastLogoutTime" property="LastLogoutTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="Sscode" property="Sscode" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="SscodeFormat" property="SscodeFormat" javaType="java.lang.Integer" jdbcType="INTEGER" />
+		<result column="SscodeSalt" property="SscodeSalt" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="PKISerialNo" property="PKISerialNo" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="SscodeHintQuestion" property="SscodeHintQuestion" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="SscodeHintAnswer" property="SscodeHintAnswer" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result column="FailedPswAnsAttemptCount" property="FailedPswAnsAttemptCount" javaType="java.lang.Integer" jdbcType="INTEGER" />
+		<result column="IsLockout" property="IsLockout" javaType="java.lang.Short" jdbcType="SMALLINT" />
+		<result column="LastLockoutTime" property="LastLockoutTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="FailedPswAttemptTime" property="FailedPswAttemptTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+		<result column="FailedPswAnsAttemptTime" property="FailedPswAnsAttemptTime" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<select id="syscomQueryAllUsers" parameterType="java.lang.String" resultMap="SyscomQueryAllUsersResultMap">
+		SELECT
+		a.UserId,
+		a.LogOnId,
+		a.UserName,
+		NVL( a.EmployeeId, '''' ) AS EmployeeId,
+		NVL( a.IDNO, '''' ) AS IDNO,
+		NVL( a.Birthday, '''' ) AS Birthday,
+		a.EffectDate,
+		a.ExpiredDate,
+		a.EmailAddress,
+		nvl( a.UpdateUserId, 0 ) AS UpdateUserId,
+		a.UpdateTime,
+		b.LogOnTime,
+		b.LogOnIP,
+		NVL( b.IsLogOn, 0 ) AS IsLogOn,
+		NVL( b.LogOnChangeSscode, 0 ) AS LogOnChangeSscode,
+		b.LastSscodeChangeTime,
+		b.SscodeErrorCount,
+		b.LastLogOnTime,
+		b.LastLogOnIP,
+		b.LastLogOffTime AS LastLogoutTime,
+		b.Sscode,
+		NVL( b.SscodeFormat, 1 ) AS SscodeFormat,
+		b.SscodeSalt,
+		b.PKISerialNo,
+		b.SscodeHintQuestion,
+		b.SscodeHintAnswer AS SscodeHintAnswer,
+		b.FailedPswAnsAttemptCount,
+		NVL( b.IsLockout, 0 ) AS IsLockout,
+		b.LastLockoutTime,
+		b.FailedPswAttemptTime,
+		b.FailedPswAnsAttemptTime
+		FROM
+		SyscomUser a
+		LEFT JOIN SyscomUserStatus b ON a.UserId = b.UserId
+
+		<if test="UserId != null ">
+			AND a.UserId = #{UserId}
+		</if>
+		<if test="UserName != null ">
+			AND a.UserName LIKE '%'|| #{UserName} ||'%'
+		</if>
+		<if test="LogOnId != null ">
+			AND RTRIM(a.LogOnId) = #{LogOnId}
+		</if>
+		<if test="userMail != null ">
+			AND RTRIM(a.EmailAddress) = #{userMail}
+		</if>
+	</select>
+</mapper>

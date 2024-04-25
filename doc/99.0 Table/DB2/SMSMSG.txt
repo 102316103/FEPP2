@@ -1,0 +1,5 @@
+alter table SMSMSG alter SMSMSG_CR_CUST set data type varchar(11);
+alter table SMSMSG alter SMSMSG_TROUT_BKNO set data type varchar(3);
+alter table SMSMSG alter SMSMSG_TRIN_ACTNO set data type varchar(16);
+alter table SMSMSG alter SMSMSG_TRIN_BKNO set data type varchar(3);
+alter table SMSMSG alter SMSMSG_CR_DIGITAL_FG set data type varchar(2);

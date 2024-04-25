@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomrolegroupExtMapper">
+	<resultMap id="RoleGroupCultureResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomrolegroupAndCulture">
+		<id property="roleid" column="ROLEID" />
+		<result property="groupid" column="GROUPID" />
+		<result property="childtype" column="CHILDTYPE" />
+		<result property="groupno" column="GROUPNO" />
+		<result property="groupname" column="GROUPNAME" />
+		<result property="effectdate" column="EFFECTDATE" />
+		<result property="expireddate" column="EXPIREDDATE" />
+	</resultMap>
+	<select id="querySelectedGroupsByRoleId" parameterType="map" resultMap="RoleGroupCultureResultMap">
+		SELECT a.RoleId, a.GroupId, a.ChildType, b.GroupNo as ChildNo,c.GroupName as Name, b.EffectDate, b.ExpiredDate
+		FROM SyscomRoleGroup a ,SyscomGroup b,SyscomGroupCulture c
+		WHERE a.GroupId = b.GroupId AND b.GroupId = c.GroupId AND
+		(a.RoleId = #{roleid}) AND (a.ChildType = 'G') AND
+		(c.Culture = #{culture,jdbcType=CHAR})
+		UNION
+		SELECT a.RoleId, a.GroupId, a.ChildType, b.ResourceNo as ChildNo,c.ResourceName as Name, b.EffectDate, b.ExpiredDate
+		FROM SyscomRoleGroup a,SyscomResource b,SyscomResourceCulture c
+		WHERE a.GroupId = b.ResourceId AND b.ResourceId = c.ResourceId AND
+		(a.RoleId = #{roleid}) AND (a.ChildType = 'R') AND
+		(c.Culture = #{culture,jdbcType=CHAR})
+	</select>
+	<select id="queryUnSelectedGroupsByRoleId" parameterType="map" resultMap="RoleGroupCultureResultMap">
+		SELECT ${roleid} as RoleId , a.GroupId, 'G' AS ChildType, a.GroupNo AS ChildNo,
+		b.GroupName AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomGroup a,SyscomGroupCulture b
+		LEFT JOIN SyscomRoleGroup c on a.GroupId = c.GroupId
+		WHERE a.GroupId = b.GroupId AND (b.Culture = #{culture})
+		AND (c.ChildType is null or c.ChildType = 'G') AND (c.RoleId IS NULL OR c.RoleId = #{roleid}) AND c.GroupId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+		UNION
+		SELECT ${roleid} as RoleId , a.ResourceId AS GroupId, 'R' AS ChildType,a.ResourceNo AS ChildNo,
+		b.ResourceName AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomResource a,SyscomResourceCulture b
+		LEFT JOIN SyscomRoleGroup c ON a.ResourceId = c.GroupId
+		WHERE a.ResourceId = b.ResourceId AND (b.Culture = #{culture})
+		AND (c.ChildType is null or c.ChildType = 'R') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+		AND c.GroupId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+	</select>
+	<resultMap id="UserSelectedGroupMap" type="com.syscom.safeaa.mybatis.model.Syscomrolegroup">
+		<id property="roleid" column="ROLEID" />
+		<result property="groupid" column="GROUPID" />
+		<result property="childtype" column="CHILDTYPE" />
+		<result property="safedefinefunctionlist" column="SAFEDEFINEFUNCTIONLIST" />
+		<result property="userdefinefunctionlist" column="USERDEFINEFUNCTIONLIST" />
+	</resultMap>
+	<select id="queryExecutableGroupsByUserId" parameterType="map" resultMap="UserSelectedGroupMap">
+		WITH DirectReports AS
+		( SELECT RoleId, ChildId, ChildType
+		FROM SyscomRoleMembers
+		WHERE ChildId = #{userid} AND ChildType = 'U'
+		UNION ALL
+		SELECT RoleId, ChildId, ChildType FROM
+		(
+			WITH RPL (RoleId, ChildId, childtype,EffectDate,ExpiredDate) AS (
+				SELECT RoleId, ChildId, childtype,EffectDate,ExpiredDate
+				FROM SyscomRoleMembers WHERE ChildType = 'U' AND ChildId = #{userid}
+				UNION ALL 
+				SELECT CHILD.RoleId, CHILD.ChildId, CHILD.childtype,CHILD.EffectDate,CHILD.ExpiredDate
+				FROM RPL PARENT, SyscomRoleMembers CHILD
+				WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL		
+		)
+		WHERE ChildType = 'R' AND SYSDATE BETWEEN EffectDate AND ExpiredDate
+		)
+		SELECT DISTINCT dr.RoleId, rg.GroupId, rg.ChildType,
+		rg.SafeDefineFunctionList, rg.UserDefineFunctionList
+		FROM DirectReports dr,SyscomRole r,SyscomRoleGroup rg
+		WHERE dr.RoleId = r.RoleId AND dr.RoleId = rg.RoleId
+		AND SYSDATE BETWEEN r.EffectDate AND r.ExpiredDate
+		UNION
+		SELECT DISTINCT ud.RoleId, rg.GroupId, rg.ChildType,
+		'' as SafeDefineFunctionList, '' as UserDefineFunctionList
+		FROM SyscomUserDeputy ud,SyscomRoleGroup rg
+		WHERE ud.RoleId = rg.RoleId AND ud.DeputyUserId = #{userid}
+		ORDER BY ChildType, GroupId
+	</select>
+	<delete id="deleteAllByGroupId" parameterType="map">
+		delete from SYSCOMROLEGROUP
+		where GROUPID = #{groupid,jdbcType=INTEGER}
+		and CHILDTYPE = #{childtype,jdbcType=CHAR}
+	</delete>
+	<delete id="deleteAllByRoleId" parameterType="map">
+		delete from SyscomRoleGroup
+		where RoleId = #{roleid,jdbcType=INTEGER}
+	</delete>
+</mapper>

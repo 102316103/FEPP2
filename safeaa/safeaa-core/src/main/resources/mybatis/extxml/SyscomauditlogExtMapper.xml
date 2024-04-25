@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomauditlogExtMapper">
+	<select id="queryAllDataBy" parameterType="map" resultMap="com.syscom.safeaa.mybatis.mapper.SyscomauditlogMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscomauditlogMapper.Base_Column_List" />
+		from SYSCOMAUDITLOG
+		<where>
+			<if test="userId != ''">
+				and UserId = #{userId,jdbcType=INTEGER}
+			</if>
+			<if test="auditType != ''">
+				and AuditType = #{auditType,jdbcType=INTEGER}
+			</if>
+			<if test="result != ''">
+				and Result = #{result,jdbcType=SMALLINT}
+			</if>
+		</where>
+		<if test="@com.syscom.safeaa.utils.DbHelper@isSqlInOrderByValid(orderBy)">
+			ORDER BY ${orderBy}
+		</if>
+		<if test="topCount != null">
+			FETCH FIRST #{topCount,jdbcType=INTEGER} ROWS ONLY
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomresourceExtMapper">
+	<resultMap id="SyscomresourceAndCultureResult" type="com.syscom.safeaa.mybatis.vo.SyscomresourceAndCulture">
+		<result column="RESOURCEID" property="resourceid" />
+		<result column="RESOURCENO" property="resourceno" />
+		<result column="SAFEDEFINEFUNCTIONLIST" property="safedefinefunctionlist" />
+		<result column="USERDEFINEFUNCTIONLIST" property="userdefinefunctionlist" />
+		<result column="RESOURCEURL" property="resourceurl" />
+		<result column="EFFECTDATE" property="effectdate" />
+		<result column="EXPIREDDATE" property="expireddate" />
+		<result column="UPDATEUSERID" property="updateuserid" />
+		<result column="UPDATETIME" property="updatetime" />
+		<result column="CULTURE" property="culture" />
+		<result column="RESOURCENAME" property="resourcename" />
+		<result column="REMARK" property="remark" />
+	</resultMap>
+	<select id="queryResourceIdByNo" parameterType="String" resultType="Integer">
+		SELECT RESOURCEID
+		FROM SYSCOMRESOURCE
+		WHERE RESOURCENO = #{resourceno}
+		ORDER BY RESOURCEID
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	<sql id="queryAllResourcesSql">
+		SELECT
+		a.RESOURCEID,
+		a.RESOURCENO,
+		NVL( a.SAFEDEFINEFUNCTIONLIST, '''' ) AS SAFEDEFINEFUNCTIONLIST,
+		NVL( a.USERDEFINEFUNCTIONLIST, '''' ) AS USERDEFINEFUNCTIONLIST,
+		a.RESOURCEURL,
+		a.EFFECTDATE,
+		a.EXPIREDDATE,
+		NVL( a.UPDATEUSERID, 0 ) AS UPDATEUSERID,
+		a.UPDATETIME,
+		NVL( cul.CULTURE, '''' ) AS CULTURE,
+		NVL( cul.RESOURCENAME, '''' ) AS RESOURCENAME,
+		NVL( cul.REMARK, '''' ) AS REMARK
+		FROM
+		SYSCOMRESOURCE a,
+		SYSCOMRESOURCECULTURE cul
+	</sql>
+	<select id="queryAllResources" parameterType="com.syscom.safeaa.mybatis.vo.SyscomresourceAndCulture" resultMap="SyscomresourceAndCultureResult">
+		<include refid="queryAllResourcesSql" />
+		<where>
+			a.ResourceId = cul.ResourceId
+			AND (cul.CULTURE IS NULL
+			<if test="culture != null and culture != ''">
+				OR cul.CULTURE = #{culture}
+			</if>
+			)
+			<if test="resourceid != null ">
+				AND a.RESOURCEID = #{resourceid}
+			</if>
+			<if test="resourceno != null and resourceno != ''">
+				AND RTRIM(a.RESOURCENO) = #{resourceno}
+			</if>
+			<if test="resourcename != null and resourcename != ''">
+				AND cul.RESOURCENAME like '%'|| #{resourcename} ||'%'
+			</if>
+		</where>
+	</select>
+</mapper>

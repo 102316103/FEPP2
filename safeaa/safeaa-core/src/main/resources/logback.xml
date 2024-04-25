@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- %m輸出的信息,%p日志級別,%t線程名,%d日期,%c類的全名,%i索引【從數字0開始遞增】,,, -->
+	<!-- appender是configuration的子節點，是負責寫日志的組件。 -->
+	<!-- ConsoleAppender：把日志輸出到控制臺 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %p (%file:%line\)- %m%n</pattern>
+			<!-- 控制臺也要使用UTF-8，不要使用GBK，否則會中文亂碼 -->
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	<!-- RollingFileAppender：滾動記錄檔案，先將日志記錄到指定檔案，當符合某個條件時，將日志記錄到其他檔案 -->
+	<!-- 以下的大概意思是：1.先按日期存日志，日期變了，將前一天的日志檔案名重命名為XXX%日期%索引，新的日志仍然是demo.log -->
+	<!-- 2.如果日期沒有發生變化，但是當前日志的檔案大小超過1KB時，對當前日志進行分割 重命名 -->
+	<appender name="server_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>log/server.log</File>
+		<!-- rollingPolicy:當發生滾動時，決定 RollingFileAppender 的行為，涉及檔案移動和重命名。 -->
+		<!-- TimeBasedRollingPolicy： 最常用的滾動策略，它根據時間來制定滾動策略，既負責滾動也負責出發滾動 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 活動檔案的名字會根據fileNamePattern的值，每隔一段時間改變一次 -->
+			<!-- 檔案名：log/demo.2017-12-05.0.log -->
+			<fileNamePattern>log/server.%d.%i.log</fileNamePattern>
+			<!-- 每產生一個日志檔案，該日志檔案的保存期限為30天 -->
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- maxFileSize:這是活動檔案的大小，預設值是10MB，測試時可改成1KB看效果 -->
+				<maxFileSize>20MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<!-- pattern節點，用來設置日志的輸入格式 -->
+			<pattern>
+				%d %p (%file:%line\)- %m%n
+			</pattern>
+			<!-- 記錄日志的編碼:此處設置字符集 - -->
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	<!-- 控制臺輸出日志級別 -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="server_log" />
+	</root>
+	<!-- 指定項目中某個包，當有日志操作行為時的日志記錄級別 -->
+	<!-- com.liyan為根包，也就是只要是發生在這個根包下面的所有日志操作行為的權限都是DEBUG -->
+	<!-- 級別依次為【從高到低】：FATAL > ERROR > WARN > INFO > DEBUG > TRACE -->
+	<logger name="com.syscom.safeaa" level="DEBUG">
+		<appender-ref ref="server_log" />
+	</logger>
+	<logger name="jdbc.sqlonly" additivity="false">
+		<level value="OFF" />
+	</logger>
+	<logger name="jdbc.audit" additivity="false">
+		<level value="OFF" />
+	</logger>
+	<logger name="jdbc.resultset" additivity="false">
+		<level value="OFF" />
+	</logger>
+	<logger name="jdbc.connection" additivity="false">
+		<level value="OFF" />
+	</logger>
+	<logger name="jdbc.sqltiming" additivity="true">
+		<level value="DEBUG" />
+	</logger>
+</configuration>

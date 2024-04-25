@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{home}">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body>
+<div layout:fragment="panel-condition">
+    <form id="form-validator" th:object="${form}" th:action="@{/inbk/UI_013106/confirmClick}" method="post">
+        <table border="0" cellspacing="0" class="table-condition">
+            <tr>
+                <td class="condition-label" for="APIDCob">
+                    <label class="col-form-label">輸入AP-ID</label>
+                </td>
+                <td class="condition-input">
+                    <select class="form-control" th:field="*{aPIDCob}">
+                        <option th:each="option : ${options}" th:text="${option.text}" th:value="${option.value}"/>
+                    </select>
+                </td>
+                <td class="condition-label" for="type">
+                    <input class="col-form-radio" type="radio"
+                           th:value="${T(com.syscom.fep.web.form.inbk.UI_013106_Form.RadioOption).EXCHECKINRBN}"
+                           th:field="*{radioOption}" fep:checked="*{radioOption}">
+                    <label for="radioORI" class="col-form-label">EX-CHECK IN</label>
+                    <input class="col-form-radio" type="radio"
+                           th:value="${T(com.syscom.fep.web.form.inbk.UI_013106_Form.RadioOption).EXCHECKOUTRBN}"
+                           th:field="*{radioOption}" fep:checked="*{radioOption}">
+                    <label for="radioAGENCY" class="col-form-label">EX-CHECK OUT</label>
+                </td>
+              <!--  <td class="condition-label" for="CURDdl">
+                    <label class="col-form-label">幣別</label>
+                </td>
+                <td class="condition-input">
+                    <select class="form-control" id="CURDdl" disabled="disabled" style="width: 100px">
+                    </select>
+                </td>-->
+            </tr>
+        </table>
+    </form>
+</div>
+<div layout:fragment="panel-button">
+    <button type="button" class="btn btn-primary" id="btnConfirm">確認</button>
+    <button type="button" class="btn btn-primary" id="btnClear">清除</button>
+</div>
+<div layout:fragment="panel-summary" class="panel-hidden">
+</div>
+<div layout:fragment="panel-grid">
+    <div class="card-body table-responsive p-0">
+        <div class="card card-outline card-primary">
+            <div class="card-body" style="display: block;">
+                <table border="1" style="border-collapse: separate;border-spacing: 1px" cellspacing="0"
+                       class="table-condition" width="100%">
+                    <thead>
+                    <tr align="center" width="800px">
+                        <td><b></b></td>
+                        <td align="left"><b>財金</b></td>
+                        <td align="left"><b>本行</b></td>
+                    </tr>
+                    </thead>
+                <!--    <tr>
+                        <td>系統狀態</td>
+                        <td th:if="${soctLbl != null}" th:text="${soctLbl}"></td>
+                        <td th:if="${mboctLbl != null}" th:text="${mboctLbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1000通匯各類子系統</td>
+                        <td th:if="${acot1000Lbl != null}" th:text="${acot1000Lbl}"></td>
+                        <td th:if="${mbact1000Lbl != null}" th:text="${mbact1000Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1100 匯款類子系統</td>
+                        <td th:if="${aoct1100Lbl != null}" th:text="${aoct1100Lbl}"></td>
+                        <td th:if="${mbact1100Lbl != null}" th:text="${mbact1100Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1200 代收款項類子系統</td>
+                        <td th:if="${aoct1200Lbl != null}" th:text="${aoct1200Lbl}"></td>
+                        <td th:if="${mbact1200Lbl != null}" th:text="${mbact1200Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1300 代繳代發類子系統</td>
+                        <td th:if="${aoct1300Lbl != null}" th:text="${aoct1300Lbl}"></td>
+                        <td th:if="${mbact1300Lbl != null}" th:text="${mbact1300Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1400 一般通信類子系統</td>
+                        <td th:if="${aoct1400Lbl != null}" th:text="${aoct1400Lbl}"></td>
+                        <td th:if="${mbact1400Lbl != null}" th:text="${mbact1400Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>1600 外幣通匯各類子系統</td>
+                        <td th:if="${fcrmstatAoctrm != null}" th:text="${fcrmstatAoctrm}"></td>
+                        <td th:if="${fcrmstatMbactrm != null}" th:text="${fcrmstatMbactrm}"></td>
+                    </tr>-->
+                    <tr>
+                        <td>2000 CD/ATM 共用系統提款作業</td>
+                        <td th:if="${aoct2000Lbl != null}" th:text="${aoct2000Lbl}"></td>
+                        <td th:if="${mbact2000Lbl != null}" th:text="${mbact2000Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2200 CD/ATM 共用系統轉帳作業</td>
+                        <td th:if="${aoct2200Lbl != null}" th:text="${aoct2200Lbl}"></td>
+                        <td th:if="${mbact2200Lbl != null}" th:text="${mbact2200Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2500 晶片卡共用系統</td>
+                        <td th:if="${aoct2500Lbl != null}" th:text="${aoct2500Lbl}"></td>
+                        <td th:if="${mbact2500Lbl != null}" th:text="${mbact2500Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2510 晶片卡提款作業</td>
+                        <td th:if="${aoct2510Lbl != null}" th:text="${aoct2510Lbl}"></td>
+                        <td th:if="${mbact2510Lbl != null}" th:text="${mbact2510Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2520 晶片卡轉帳作業</td>
+                        <td th:if="${aoct2520Lbl != null}" th:text="${aoct2520Lbl}"></td>
+                        <td th:if="${mbact2520Lbl != null}" th:text="${mbact2520Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2530 晶片卡繳款作業</td>
+                        <td th:if="${aoct2530Lbl != null}" th:text="${aoct2530Lbl}"></td>
+                        <td th:if="${mbact2530Lbl != null}" th:text="${mbact2530Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2540 晶片卡消費扣款作業</td>
+                        <td th:if="${aoct2540Lbl != null}" th:text="${aoct2540Lbl}"></td>
+                        <td th:if="${mbact2540Lbl != null}" th:text="${mbact2540Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2550 晶片卡預先授權作業</td>
+                        <td th:if="${aoct2550Lbl != null}" th:text="${aoct2550Lbl}"></td>
+                        <td th:if="${mbact2550Lbl != null}" th:text="${mbact2550Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2560 晶片卡全國繳費作業</td>
+                        <td th:if="${aoct2560Lbl != null}" th:text="${aoct2560Lbl}"></td>
+                        <td th:if="${mbact2560Lbl != null}" th:text="${mbact2560Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>2570 晶片卡跨國提款作業</td>
+                        <td th:if="${aoct2570Lbl != null}" th:text="${aoct2570Lbl}"></td>
+                        <td th:if="${mbact2570Lbl != null}" th:text="${mbact2570Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>7100 轉帳退款類交易</td>
+                        <td th:if="${aoct7100Lbl != null}" th:text="${aoct7100Lbl}"></td>
+                        <td th:if="${mbact7100Lbl != null}" th:text="${mbact7100Lbl}"></td>
+                    </tr>
+                    <tr>
+                        <td>7300 FXML跨行付款交易</td>
+                        <td th:if="${aoct7300Lbl != null}" th:text="${aoct7300Lbl}"></td>
+                        <td th:if="${mbact7300Lbl != null}" th:text="${mbact7300Lbl}"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-body" style="display: block;">
+                <table border="1" style="border-collapse: separate;border-spacing: 1px" cellspacing="0"
+                       class="table-condition" width="75%">
+                    <tr>
+                        <td rowspan="3"><input type="checkbox" th:if="${intra==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${intra==false}" disabled>自行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iwdI == true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iwdI == false}" disabled>提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iftI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iftI==false}" disabled>
+                            轉帳
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${admI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${admI==false}" disabled>
+                            存款
+                        </td>
+ 						<td>
+                            <input type="checkbox" th:if="${iiqI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iiqI==false}" disabled>
+                            餘額查詢
+                        </td>
+                    <!--    <td>
+                            <input type="checkbox" th:if="${fwdI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${fwdI==false}" disabled>
+                            外幣提款
+                        </td> -->
+                    </tr>
+                    <tr>
+						<td>
+                            <input type="checkbox" th:if="${fwdI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${fwdI==false}" disabled>
+                            外幣提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${nwdi==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${nwdi==false}" disabled>
+                            無卡提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${nfwi==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${nfwi==false}" disabled>
+                            外幣無卡提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${ipyI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ipyI==false}" disabled>
+                            繳款
+                        </td>
+                    <!--    <td>
+                            <input type="checkbox" th:if="${iccdpI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iccdpI==false}" disabled>
+                            全國繳費
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${etxI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${etxI==false}" disabled>
+                            全國繳稅
+                        </td> 
+                        <td>&nbsp;</td>-->
+                    </tr>
+                    <tr>
+                      <!--  <td>
+                            <input type="checkbox" th:if="${ipyI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ipyI==false}" disabled>
+                            繳款
+                        </td> -->
+                        <td>
+                            <input type="checkbox" th:if="${iccdpI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iccdpI==false}" disabled>
+                            全國繳費
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${etxI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${etxI==false}" disabled>
+                            全國繳稅
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${caI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${caI==false}" disabled>
+                            預借現金
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${caaI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${caaI==false}" disabled>
+                            AE預借現金
+                        </td>
+                       <!-- <td>&nbsp;</td>-->
+                    </tr>
+                   <!-- <tr>
+                        <td>
+                            <input type="checkbox" th:if="${caI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${caI==false}" disabled>
+                            預借現金
+                        </td> 
+                        <td>
+                            <input type="checkbox" th:if="${caaI==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${caaI==false}" disabled>
+                            AE預借現金
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${aig==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${aig==false}" disabled>
+                            南山人壽保單繳款
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${hkIssue==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${hkIssue==false}" disabled>
+                            香港分行原存行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${hkFiscmb==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${hkFiscmb==false}" disabled>
+                            香港分行財金會員銀行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${hkPlus==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${hkPlus==false}" disabled>
+                            香港分行PLUS
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${moIssue==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${moIssue==false}" disabled>
+                            澳門分行原存行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${moFiscmb==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${moFiscmb==false}" disabled>
+                            澳門分行財金會員銀行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${moPlus==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${moPlus==false}" disabled>
+                            澳門分行PLUS
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>-->
+                    <tr>
+                        <td rowspan="5">
+                            <input type="checkbox" th:if="${agent==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${agent==false}" disabled>
+                            代理行
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iwdA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iwdA==false}" disabled>
+                            <!--提款-->台幣提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${fawa==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${fawa==false}" disabled>
+                            <!--提款-->外幣提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iftA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iftA==false}" disabled>
+                            轉帳
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${admA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${admA==false}" disabled>
+                            跨行存款
+                        </td>
+                        <!--<td>&nbsp;</td>-->
+                        <!--<td>&nbsp;</td>-->
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${ipyA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ipyA==false}" disabled>
+                            繳款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iccdpA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iccdpA==false}" disabled>
+                            全國繳費（晶片）
+                        </td>      
+                        <td>
+                            <input type="checkbox" th:if="${cdpA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cdpA==false}" disabled>
+                            全國繳費(ID+ACC)
+                        </td>            
+                        <td>
+                            <input type="checkbox" th:if="${etxA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${etxA==false}" disabled>
+                            全國繳稅
+                        </td>
+                       <!-- <td>&nbsp;</td> -->
+                    </tr>
+                    <tr>
+                     <!--   <td>
+                            <input type="checkbox" th:if="${t2525A==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${t2525A==false}" disabled>
+                            消費扣款（固定費率）
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cpuA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cpuA==false}" disabled>
+                            消費扣款（變動費率）
+                        </td>-->
+                        <td>
+                            <input type="checkbox" th:if="${cauA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cauA==false}" disabled>
+                            預授交易
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${eafA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eafA==false}" disabled>
+                            EMV 國際提款銀聯卡
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${ewvA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ewvA==false}" disabled>
+                            EMV國際提款(PLUS)
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${ewmA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ewmA==false}" disabled>
+                            EMV國際提款(CIRRUS)
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${eavA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eavA==false}" disabled>
+                            EMV預借現金(VISA)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${eamA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eamA==false}" disabled>
+                            EMV預借現金(MASTER)
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${nwdA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${nwdA==false}" disabled>
+                            無卡跨行提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${vaaA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${vaaA==false}" disabled>
+                            約定及核驗服務
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${eajA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eajA==false}" disabled>
+                            EMV預借現金(JCB)
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                        <td>
+                            <input type="checkbox" th:if="${cavA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cavA==false}" disabled>
+                            預借現金VISA
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${camA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${camA==false}" disabled>
+                            預借現金MASTER
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cajA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cajA==false}" disabled>
+                            預借現金JCB
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                       <td>
+                            <input type="checkbox" th:if="${cauA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cauA==false}" disabled>
+                            預授交易
+                        </td> 
+                        <td>
+                            <input type="checkbox" th:if="${cwvA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cwvA==false}" disabled>
+                            國際提款PLUS
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cwmA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cwmA==false}" disabled>
+                            國際提款CIRRUS
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cafA==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cafA==false}" disabled>
+                            代理國際提款－銀聯卡
+                        </td>
+                    </tr>-->
+                    <tr>
+                        <td rowspan="5">
+                            <input type="checkbox" th:if="${issue==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${issue==false}" disabled>
+                            原存
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iwdF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iwdF==false}" disabled>
+                            提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iftF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iftF==false}" disabled>
+                            轉帳
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iiqF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iiqF==false}" disabled>
+                            餘額查詢
+                        </td>
+                       <!-- <td>&nbsp;</td>-->
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${ipyF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ipyF==false}" disabled>
+                            繳款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iccdpF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iccdpF==false}" disabled>
+                            全國繳費（晶片）
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cdpF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cdpF==false}" disabled>
+                            全國繳費（ID+ACT）
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${etxF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${etxF==false}" disabled>
+                            全國繳稅
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${t2525F==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${t2525F==false}" disabled>
+                            消費扣款（固定費率）
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cpuF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cpuF==false}" disabled>
+                            消費扣款（變動費率）
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${cauF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cauF==false}" disabled>
+                            預授交易
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${gpcwdF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gpcwdF==false}" disabled>
+                            國際提款PLUS/CIRRUS
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${gpemvF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gpemvF==false}" disabled>
+                            EMV國際提款PLUS/CIRRUS
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${gpcadF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gpcadF==false}" disabled>
+                            原存預借現金VISA/MASTER
+                        </td>
+                        <!--<td>&nbsp;</td>-->
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${gpiwdF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gpiwdF==false}" disabled>
+                            晶片卡跨國提款
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${gpobF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gpobF==false}" disabled>
+                            跨境支付交易
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${vaaF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${vaaF==false}" disabled>
+                            約定及核驗服務
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">
+                            <input type="checkbox" th:if="${pure==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${pure==false}" disabled>
+                            純代理
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iiqp==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iiqp==false}" disabled>
+                            晶片卡餘額查詢
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iftF==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iftF==false}" disabled>
+                            轉帳
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${iccdpP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${iccdpP==false}" disabled>
+                            全國繳費(晶片)
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${cdpP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cdpP==false}" disabled>
+                            全國繳費(ID+ACC)
+                        </td>
+                       <!-- <td>&nbsp;</td>-->
+                       <!-- <td>&nbsp;</td>-->
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${ipyP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ipyP==false}" disabled>
+                            繳款-跨行(2531)
+                        </td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${equP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${equP==false}" disabled>
+                            EMV 銀聯卡餘額查詢
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${eqpP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eqpP==false}" disabled>
+                            EMV PLUS餘額查詢
+                        </td>
+                        <td>
+                            <input type="checkbox" th:if="${eqcP==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${eqcP==false}" disabled>
+                            EMV CIRRUS卡餘額查詢
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <table border="0" cellspacing="0" class="table-condition" width="75%">
+                    <tr>其他通道及線路</tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:if="${cbs==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${cbs==false}" disabled>
+                            <!--CBS-T24--> CBS主機
+                            <!--<input type="checkbox" th:if="${fedi==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${fedi==false}" disabled>
+                            FEDI-->
+                            <input type="checkbox" th:if="${nb==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${nb==false}" disabled>
+                            網銀
+                            <input type="checkbox" th:if="${webatm==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${webatm==false}" disabled>
+                            WEB ATM服務
+                            <input type="checkbox" th:if="${ascChannel==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ascChannel==false}" disabled>
+                            新信用卡
+                            <input type="checkbox" th:if="${pv==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${pv==false}" disabled>
+                            指靜脈
+                            <input type="checkbox" th:if="${smtp==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${smtp==false}" disabled>
+                            手機門號轉帳中台
+                            <!--<input type="checkbox" th:if="${ascChannel==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ascChannel==false}" disabled>
+                            永豐信用卡通道-->
+                        </td>
+                    </tr>
+                    <!--<tr>
+                        <td>
+                            <input type="checkbox" th:if="${asc==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${asc==false}" disabled>
+                            永豐信用卡線路
+                            <input type="checkbox" th:if="${ascmd==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ascmd==false}" disabled>
+                            永豐晶片錢卡線路
+                            <input type="checkbox" th:if="${gcard==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${gcard==false}" disabled>
+                            永豐GIFT卡線路
+                            <input type="checkbox" th:if="${sps==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${sps==false}" disabled>
+                            永豐證券線路
+                            <input type="checkbox" th:if="${ascmac==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${ascmac==false}" disabled>
+                            與ASC壓碼線路
+                            <input type="checkbox" th:if="${spsmac==true}" th:checked="checked" disabled>
+                            <input type="checkbox" th:if="${spsmac==false}" disabled>
+                            與SPS壓碼線路
+                        </td>
+                    </tr>-->
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="panel-script">
+    <script type="text/javascript" th:src="@{/js/inbk/UI013106.js}"></script>
+</div>
+</body>
+</html>

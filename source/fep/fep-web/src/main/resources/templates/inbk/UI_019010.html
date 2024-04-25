@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{home}">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>UI019010</title>
+</head>
+<body>
+	<div layout:fragment="panel-condition" class="panel-hidden"></div>
+	<div layout:fragment="panel-button">
+		<button type="button" class="btn btn-primary" id="btnConfirm">確認</button>
+	</div>
+	<div layout:fragment="panel-summary" class="panel-hidden"></div>
+	<div layout:fragment="panel-grid">
+		<form id="form-validator" th:object="${form}" th:action="@{/inbk/UI_019010/confirm}" method="post">
+			<div class="card-body table-responsive p-0">
+				<div class="card card-outline card-primary">
+					<div class="card-body" style="display: block;">
+						<table border="1" style="border-collapse: separate; border-spacing: 1px" cellspacing="0" class="table-condition" width="100%">
+							<thead>
+								<tr align="center" width="800px">
+									<td>
+										<b></b>
+									</td>
+									<td align="left">
+										<b>財金</b>
+									</td>
+									<td align="left">
+										<b>本行</b>
+									</td>
+								</tr>
+							</thead>
+							<tr>
+								<td>系統狀態</td>
+								<td th:text="*{sysstat.sysstatSoct}"></td>
+								<td th:text="*{sysstat.sysstatMboct}"></td>
+							</tr>
+							<tr>
+								<td>1000通匯各類子系統</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1000Lbl" th:field="*{sysstat.sysstatAoct1000}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-日初 House Keeping 完成</option>
+										<option value="2">2-財金公司AP停止(Stop)作業</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-checkout財金公司啟動</option>
+										<option value="5">5-AP checkout(由參加單位啟動)</option>
+										<option value="7">7-AP checkout(由財金公司啟動)</option>
+										<option value="9">9-財金公司於結算帳時停止作業</option>
+									</select>
+								</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1000Lbl" th:field="*{sysstat.sysstatMbact1000}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>1100 匯款類子系統</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1100Lbl" th:field="*{sysstat.sysstatAoct1100}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-日初 House Keeping 完成</option>
+										<option value="2">2-財金公司AP停止(Stop)作業</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-checkout財金公司啟動</option>
+										<option value="5">5-AP checkout(由參加單位啟動)</option>
+										<option value="7">7-AP checkout(由財金公司啟動)</option>
+										<option value="9">9-財金公司於結算帳時停止作業</option>
+									</select>
+								</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1100Lbl" th:field="*{sysstat.sysstatMbact1100}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>1200 代收款項類子系統</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1200Lbl" th:field="*{sysstat.sysstatAoct1200}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-日初 House Keeping 完成</option>
+										<option value="2">2-財金公司AP停止(Stop)作業</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-checkout財金公司啟動</option>
+										<option value="5">5-AP checkout(由參加單位啟動)</option>
+										<option value="7">7-AP checkout(由財金公司啟動)</option>
+										<option value="9">9-財金公司於結算帳時停止作業</option>
+									</select>
+								</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1200Lbl" th:field="*{sysstat.sysstatMbact1200}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>1300 代繳代發類子系統</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1300Lbl" th:field="*{sysstat.sysstatAoct1300}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-日初 House Keeping 完成</option>
+										<option value="2">2-財金公司AP停止(Stop)作業</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-checkout財金公司啟動</option>
+										<option value="5">5-AP checkout(由參加單位啟動)</option>
+										<option value="7">7-AP checkout(由財金公司啟動)</option>
+										<option value="9">9-財金公司於結算帳時停止作業</option>
+									</select>
+								</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1300Lbl" th:field="*{sysstat.sysstatMbact1300}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>1400 一般通信類子系統</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1400Lbl" th:field="*{sysstat.sysstatAoct1400}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-日初 House Keeping 完成</option>
+										<option value="2">2-財金公司AP停止(Stop)作業</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-checkout財金公司啟動</option>
+										<option value="5">5-AP checkout(由參加單位啟動)</option>
+										<option value="7">7-AP checkout(由財金公司啟動)</option>
+										<option value="9">9-財金公司於結算帳時停止作業</option>
+									</select>
+								</td>
+								<td class="condition-input">
+									<select class="form-control" id="acot1400Lbl" th:field="*{sysstat.sysstatMbact1400}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td style="height: 15px"></td>
+								<td></td>
+								<td></td>
+							<tr>
+								<td>2000 CD/ATM 共用系統提款作業</td>
+								<td th:text="*{sysstat.sysstatAoct2000}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2000Lbl" th:field="*{sysstat.sysstatMbact2000}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2200 CD/ATM 共用系統轉帳作業</td>
+								<td th:text="*{sysstat.sysstatAoct2200}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2200Lbl" th:field="*{sysstat.sysstatMbact2200}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2500 晶片卡共用系統</td>
+								<td th:text="*{sysstat.sysstatAoct2500}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2500Lbl" th:field="*{sysstat.sysstatMbact2500}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2510 晶片卡提款作業</td>
+								<td th:text="*{sysstat.sysstatAoct2510}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2510Lbl" th:field="*{sysstat.sysstatMbact2510}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2520 晶片卡轉帳作業</td>
+								<td th:text="*{sysstat.sysstatAoct2520}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2520Lbl" th:field="*{sysstat.sysstatMbact2520}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2530 晶片卡繳款作業</td>
+								<td th:text="*{sysstat.sysstatAoct2530}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2530Lbl" th:field="*{sysstat.sysstatMbact2530}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2540 晶片卡消費扣款作業</td>
+								<td th:text="*{sysstat.sysstatAoct2540}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2540Lbl" th:field="*{sysstat.sysstatMbact2540}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2550 晶片卡預先授權作業</td>
+								<td th:text="*{sysstat.sysstatAoct2550}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2550Lbl" th:field="*{sysstat.sysstatMbact2550}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2560 晶片卡全國繳費作業</td>
+								<td th:text="*{sysstat.sysstatAoct2560}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2560Lbl" th:field="*{sysstat.sysstatMbact2560}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>2570 晶片卡跨國提款作業</td>
+								<td th:text="*{sysstat.sysstatAoct2570}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2570Lbl" th:field="*{sysstat.sysstatMbact2570}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>7100 轉帳退款類交易</td>
+								<td th:text="*{sysstat.sysstatAoct7100}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot7100Lbl" th:field="*{sysstat.sysstatMbact7100}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>7300 FXML跨行付款交易</td>
+								<td th:text="*{sysstat.sysstatAoct7300}"></td>
+								<td class="condition-input">
+									<select class="form-control" id="acot2000Lbl" th:field="*{sysstat.sysstatMbact7300}">
+										<option value="0" selected="selected">0-日終 House Keeping 完成</option>
+										<option value="1">1-AP Checkin</option>
+										<option value="2">2-AP Exceptional Checkout</option>
+										<option value="A">A-匯出Exceptional Checkout完成</option>
+										<option value="B">B-匯入Exceptional Checkout完成</option>
+										<option value="3">3-AP Pre-Checkout參加單位啟動</option>
+										<option value="4">4-AP Pre-Checkout財金公司啟動</option>
+										<option value="C">C-AP Pre-Checkout參加單位啟動</option>
+										<option value="D">D-AP Pre-Checkout財金公司啟動</option>
+										<option value="5">5-AP Checkout(由參加單位啟動)</option>
+										<option value="7">7-AP Checkout(由財金公司啟動)</option>
+										<option value="9">9-Evening Call(由參加單位啟動)</option>
+									</select>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="card-body" style="display: block;">
+						<table border="1" style="border-collapse: separate; border-spacing: 1px" cellspacing="0" class="table-condition" width="75%">
+							<tr>
+								<td rowspan="5">
+									<input type="checkbox" th:if="*{intra==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{intra==false}" disabled>自行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iwdI == true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iwdI == false}" disabled>提款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iftI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iftI==false}" disabled> 轉帳
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{admI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{admI==false}" disabled> 存款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{fwdI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{fwdI==false}" disabled> 外幣提款
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{ipyI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{ipyI==false}" disabled> 繳款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iccdpI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iccdpI==false}" disabled> 全國繳費
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{etxI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{etxI==false}" disabled> 全國繳稅
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{caI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{caI==false}" disabled> 預借現金
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{caaI==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{caaI==false}" disabled> AE預借現金
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{aig==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{aig==false}" disabled> 南山人壽保單繳款
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{hkIssue==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{hkIssue==false}" disabled> 香港分行原存行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{hkFiscmb==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{hkFiscmb==false}" disabled> 香港分行財金會員銀行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{hkPlus==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{hkPlus==false}" disabled> 香港分行PLUS
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{moIssue==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{moIssue==false}" disabled> 澳門分行原存行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{moFiscmb==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{moFiscmb==false}" disabled> 澳門分行財金會員銀行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{moPlus==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{moPlus==false}" disabled> 澳門分行PLUS
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td rowspan="5">
+									<input type="checkbox" th:if="*{agent==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{agent==false}" disabled> 代理行
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iwdA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iwdA==false}" disabled> 提款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iftA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iftA==false}" disabled> 轉帳
+								</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{ipyA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{ipyA==false}" disabled> 繳款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iccdpA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iccdpA==false}" disabled> 全國繳費（晶片）
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{etxA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{etxA==false}" disabled> 全國繳稅
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{t2525A==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{t2525A==false}" disabled> 消費扣款（固定費率）
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cpuA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cpuA==false}" disabled> 消費扣款（變動費率）
+								</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{cavA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cavA==false}" disabled> 預借現金VISA
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{camA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{camA==false}" disabled> 預借現金MASTER
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cajA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cajA==false}" disabled> 預借現金JCB
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{cauA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cauA==false}" disabled> 預授交易
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cwvA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cwvA==false}" disabled> 國際提款PLUS
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cwmA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cwmA==false}" disabled> 國際提款CIRRUS
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cafA==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cafA==false}" disabled> 代理國際提款－銀聯卡
+								</td>
+							</tr>
+							<tr>
+								<td rowspan="4">
+									<input type="checkbox" th:if="*{issue==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{issue==false}" disabled> 原存
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iwdF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iwdF==false}" disabled> 提款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iftF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iftF==false}" disabled> 轉帳
+								</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{ipyF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{ipyF==false}" disabled> 繳款
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{iccdpF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{iccdpF==false}" disabled> 全國繳費（晶片）
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cdpF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cdpF==false}" disabled> 全國繳費（ID+ACT）
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{etxF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{etxF==false}" disabled> 全國繳稅
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{t2525F==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{t2525F==false}" disabled> 消費扣款（固定費率）
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{cpuF==true}"th:checked="checked" disabled>
+									<input type="checkbox"th:if="*{cpuF==false}" disabled> 消費扣款（變動費率）
+								</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>
+									<input type="checkbox" th:if="*{cauF==true}" th:checked="checked" disabled>
+									<input type="checkbox" th:if="*{cauF==false}" disabled> 預授交易
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{gpcwdF==true}" th:checked="checked" disabled>
+									<input type="checkbox" th:if="*{gpcwdF==false}" disabled> 國際提款PLUS/CIRRUS
+								</td>
+								<td>
+									<input type="checkbox" th:if="*{gpcadF==true}" th:checked="checked" disabled> 
+									<input type="checkbox" th:if="*{gpcadF==false}" disabled> 原存預借現金VISA/MASTER
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div layout:fragment="panel-script">
+		<script type="text/javascript" th:src="@{/js/inbk/UI019010.js}"></script>
+	</div>
+</body>
+</html>

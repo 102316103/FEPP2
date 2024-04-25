@@ -1,0 +1,3 @@
+spring.datasource.emsdb.username=db2admin
+spring.datasource.deslogdb.username=db2admin
+spring.datasource.fephis.username=db2admin

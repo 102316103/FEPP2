@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscompolicyExtMapper">
+	<resultMap id="BaseResultMapAdd" type="com.syscom.safeaa.mybatis.model.SyscomQueryParentRolesByUserId">
+		<constructor>
+			<arg column="ROLEID" javaType="java.lang.Integer" jdbcType="INTEGER" />
+			<arg column="ISGLOBALSCOPE" javaType="java.lang.Integer" jdbcType="INTEGER" />
+			<arg column="POLICYVALUE" javaType="java.lang.String" jdbcType="VARCHAR" />
+			<arg column="POLICYNO" javaType="java.lang.String" jdbcType="VARCHAR" />
+			<arg column="GETVALUETYPE" javaType="java.lang.String" jdbcType="CHAR" />
+		</constructor>
+	</resultMap>
+	<resultMap id="AllPolicys" type="com.syscom.safeaa.mybatis.vo.SyscomQueryAllPolicysVo">
+		<result column="PolicyId" property="PolicyId" />
+		<result column="PolicyNo" property="PolicyNo" />
+		<result column="AllowLocal" property="AllowLocal" />
+		<result column="GetValueType" property="GetValueType" />
+		<result column="defaultpolicyvalue" property="defaultpolicyvalue" />
+		<result column="invalidmessageid" property="invalidmessageid" />
+		<result column="EffectDate" property="EffectDate" />
+		<result column="ExpiredDate" property="ExpiredDate" />
+		<result column="updateuserid" property="updateuserid" />
+		<result column="updatetime" property="updatetime" />
+		<result column="culture" property="culture" />
+		<result column="policyname" property="policyname" />
+		<result column="remark" property="remark" />
+	</resultMap>
+	<select id="queryAllData" resultMap="com.syscom.safeaa.mybatis.mapper.SyscompolicyMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscompolicyMapper.Base_Column_List" />
+		from SYSCOMPOLICY
+	</select>
+	<select id="queryPolicyByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMapAdd">
+		<!-- 根據存儲過程翻寫 -->
+		SELECT DISTINCT a.RoleId, c.IsGlobalScope, d.PolicyValue, e.PolicyNo, e.GetValueType
+		FROM ( SELECT RoleId, ChildId, childtype
+		FROM SyscomRoleMembers
+		WHERE ChildId = #{userid,jdbcType=VARCHAR} AND ChildType = 'U'
+		UNION ALL
+		SELECT RoleId, ChildId, childtype FROM
+		(
+			WITH RPL (RoleId, ChildId, childtype,EffectDate,ExpiredDate) AS (
+				SELECT RoleId, ChildId, childtype,EffectDate,ExpiredDate
+				FROM SyscomRoleMembers WHERE ChildType = 'U' AND ChildId = #{userid,jdbcType=VARCHAR}
+				UNION ALL 
+				SELECT CHILD.RoleId, CHILD.ChildId, CHILD.childtype,CHILD.EffectDate,CHILD.ExpiredDate
+				FROM RPL PARENT, SyscomRoleMembers CHILD
+				WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL
+		)
+		WHERE ChildType = 'R' AND SYSDATE BETWEEN EffectDate AND ExpiredDate) a,SyscomRoleTemplate b,SyscomTemplate c,SyscomTemplateMembers d,SyscomPolicy e
+		WHERE a.RoleId = b.RoleId AND b.TemplateId = c.TemplateId
+		AND SYSDATE BETWEEN c.EffectDate AND c.ExpiredDate AND c.TemplateId = d.TemplateId
+		AND SYSDATE BETWEEN d.EffectDate AND d.ExpiredDate AND d.PolicyId= e.PolicyId
+	</select>
+	<select id="queryPolicyByNo" parameterType="java.lang.String" resultMap="com.syscom.safeaa.mybatis.mapper.SyscompolicyMapper.BaseResultMap">
+		SELECT
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscompolicyMapper.Base_Column_List" />
+		from SYSCOMPOLICY
+		WHERE POLICYNO = #{policyNo,jdbcType=VARCHAR}
+	</select>
+	<select id="queryAllPolicys" parameterType="map" resultMap="AllPolicys">
+		SELECT
+		a.PolicyId,
+		a.PolicyNo,
+		a.AllowLocal,
+		a.GetValueType,
+		NVL( a.DefaultPolicyValue, '''' ) AS DefaultPolicyValue,
+		NVL( a.InvalidMessageId, '''' ) AS InvalidMessageId,
+		a.EffectDate,
+		a.ExpiredDate,
+		NVL( a.UpdateUserId, 0 ) AS UpdateUserId,
+		a.UpdateTime,
+		NVL( cul.Culture, '''' ) AS Culture,
+		NVL( cul.PolicyName, '''' ) AS PolicyName,
+		NVL( cul.Remark, '''' ) AS Remark
+		FROM
+		SyscomPolicy a,
+		SyscomPolicyCulture cul
+		WHERE
+		a.PolicyId = cul.PolicyId
+		AND ( cul.Culture IS NULL OR cul.Culture = #{culture} )
+		<if test="policyId != null">
+			and a.PolicyId = #{policyId}
+		</if>
+		<if test="policyName != null">
+			and cul.PolicyName LIKE #{policyName}
+		</if>
+		<if test="policyNo != null">
+			and RTRIM(a.PolicyNo) = #{policyNo}
+		</if>
+	</select>
+</mapper>

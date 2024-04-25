@@ -1,0 +1,15 @@
+/.idea
+/logs
+/log
+/spring.fep.log.path_IS_UNDEFINED
+source/fep/fep-server-common/src/main/java/com/syscom/fep/server/common/cbsprocess/Test.java
+source/fep/fep-vo/src/main/java/com/syscom/fep/vo/text/ims/TEST.java
+mqjms.log*
+/FFDC
+/tools/excel
+/tools/tcp_codegen/output
+/tools/tcp_codegen/target
+/out
+/suipClient
+/source/fep/fep-enchelper/lib/fep-suipClient-1.0.0.jar
+/source/fep/fep-suipConnect/lib/fep-suipClient-1.0.0.jar

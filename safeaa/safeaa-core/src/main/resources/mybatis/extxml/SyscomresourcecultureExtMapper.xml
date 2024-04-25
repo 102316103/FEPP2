@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomresourcecultureExtMapper">
+	<select id="queryAllByResourceId" parameterType="Integer" resultMap="com.syscom.safeaa.mybatis.mapper.SyscomresourcecultureMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscomresourcecultureMapper.Base_Column_List" />
+		from SYSCOMRESOURCECULTURE
+		<where>
+			RESOURCEID = #{resourceid}
+		</where>
+	</select>
+	<delete id="deleteAllByResourceId" parameterType="Integer">
+		delete from SYSCOMRESOURCECULTURE where RESOURCEID = #{resourceid}
+	</delete>
+</mapper>

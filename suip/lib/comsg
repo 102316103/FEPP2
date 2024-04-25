@@ -1,0 +1,2 @@
+cc -c ../suip/LogMSG.c -I../incl
+cc -c ../suip/LogMSG1.c -I../incl

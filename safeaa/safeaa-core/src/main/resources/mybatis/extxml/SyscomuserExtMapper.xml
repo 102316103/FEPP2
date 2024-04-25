@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomuserExtMapper">
+	<resultMap id="SyscomuserResult" type="com.syscom.safeaa.mybatis.model.Syscomuser">
+		<result property="userid" column="USERID" />
+		<result property="username" column="USERNAME" />
+	</resultMap>
+	<select id="selectUserList" parameterType="com.syscom.safeaa.mybatis.model.Syscomuser" resultMap="SyscomuserResult">
+		select u.USERID,u.USERNAME
+		from SYSCOMUSER u
+		where 1=1
+		<if test="userid != null ">
+			AND u.USERID = #{userid}
+		</if>
+		<if test="username != null and username != ''">
+			AND u.USERNAME like '%'|| #{username} ||'%'
+		</if>
+	</select>
+	<select id="selectUserByUserName" parameterType="String" resultMap="SyscomuserResult">
+		select u.USERID,u.USERNAME
+		from SYSCOMUSER u
+		where u.USERNAME like '%'|| #{username} ||'%'
+	</select>
+	<select id="getAllUsers" resultMap="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.Base_Column_List" />
+		from SYSCOMUSER
+	</select>
+	<select id="getUserDataByName" resultMap="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.Base_Column_List" />
+		from SYSCOMUSER
+		where USERNAME LIKE #{userName,jdbcType=VARCHAR}
+	</select>
+	<select id="queryUserByNo" resultMap="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscomuserMapper.Base_Column_List" />
+		from SYSCOMUSER
+		where LogOnId LIKE #{logonid,jdbcType=VARCHAR}
+	</select>
+	<resultMap id="SyscomuserVoResult" type="com.syscom.safeaa.mybatis.vo.SyscomUserQueryVo">
+		<result property="userid" column="UserId" />
+		<result property="logonid" column="LogOnId" />
+		<result property="username" column="UserName" />
+		<result property="employeeid" column="EmployeeId" />
+		<result property="empid" column="EmpId" />
+		<result property="idno" column="IDNO" />
+		<result property="birthday" column="Birthday" />
+		<result property="effectdate" column="EffectDate" />
+		<result property="expireddate" column="ExpiredDate" />
+		<result property="emailaddress" column="EmailAddress" />
+		<result property="updateuserid" column="UpdateUserId" />
+		<result property="updatetime" column="UpdateTime" />
+		<result property="fepUserBrno" column="FEPUSER_BRNO" />
+		<result property="fepUserBrname" column="FEPUSER_BRNAME" />
+		<result property="fepUserBrnoSt" column="FEPUSER_BRNO_ST" />
+		<result property="fepUserJob" column="FEPUSER_JOB" />
+		<result property="fepUserTlrno" column="FEPUSER_TLRNO" />
+		<result property="logontime" column="LogOnTime" />
+		<result property="logonip" column="LogOnIP" />
+		<result property="islogon" column="IsLogOn" />
+		<result property="logonchangesscode" column="LogOnChangeSSCODE" />
+		<result property="lastsscodechangetime" column="LastSSCODEChangeTime" />
+		<result property="sscodeerrorcount" column="SSCODEErrorCount" />
+		<result property="lastlogontime" column="LastLogOnTime" />
+		<result property="lastlogonip" column="LastLogOnIP" />
+		<result property="lastlogofftime" column="LastLogOffTime" />
+		<result property="sscode" column="SSCODE" />
+		<result property="sscodeformat" column="SSCODEFormat" />
+		<result property="sscodesalt" column="SSCODESalt" />
+		<result property="pkiserialno" column="PKISerialNo" />
+		<result property="sscodehintquestion" column="SSCODEHintQuestion" />
+		<result property="sscodehintanswer" column="SSCODEHintAnswer" />
+		<result property="failedpswansattemptcount" column="FailedPswAnsAttemptCount" />
+		<result property="islockout" column="IsLockout" />
+		<result property="lastlockouttime" column="LastLockoutTime" />
+		<result property="failedpswattempttime" column="FailedPswAttemptTime" />
+		<result property="failedpswansattempttime" column="FailedPswAnsAttemptTime" />
+	</resultMap>
+	<select id="queryUsersBy" parameterType="map" resultMap="SyscomuserVoResult">
+		SELECT
+		a.UserId,
+		a.LogOnId,
+		a.UserName,
+		a.EmployeeId,
+		a.EmpId,
+		a.IDNO,
+		a.Birthday,
+		to_char(a.EffectDate,'yyyy-mm-dd') as EffectDate,
+		to_char(a.ExpiredDate,'yyyy-mm-dd') as ExpiredDate,
+		a.EmailAddress,
+		a.UpdateUserId,
+		a.UpdateTime,
+		d.FEPUSER_BRNO,
+<!--		c.BCTL_ALIAS as FEPUSER_BRNAME,-->
+		d.FEPUSER_BRNO_ST,
+		d.FEPUSER_JOB,
+		d.FEPUSER_TLRNO,
+		b.LogOnTime,
+		b.LogOnIP,
+		b.IsLogOn,
+		b.LogOnChangeSSCODE,
+		b.LastSSCODEChangeTime,
+		b.SSCODEErrorCount,
+		b.LastLogOnTime,
+		b.LastLogOnIP,
+		b.LastLogOffTime,
+		b.SSCODE,
+		b.SSCODEFormat,
+		b.SSCODESalt,
+		b.PKISerialNo,
+		b.SSCODEHintQuestion,
+		b.SSCODEHintAnswer,
+		b.FailedPswAnsAttemptCount,
+		b.IsLockout,
+		b.LastLockoutTime,
+		b.FailedPswAttemptTime,
+		b.FailedPswAnsAttemptTime
+		FROM
+		SyscomUser a
+		INNER JOIN SyscomUserStatus b ON a.UserId = b.UserId
+		INNER JOIN FEPUSER d ON d.FEPUSER_USERID = a.EMPID
+<!--		LEFT JOIN BCTL c ON c.BCTL_BRNO = d.FEPUSER_BRNO-->
+		<where>
+			<if test="logonId != null and logonId != ''">
+				AND a.LogOnId = #{logonId}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND RTRIM(a.UserName) = #{userName}
+			</if>
+		</where>
+		<if test="@com.syscom.safeaa.utils.DbHelper@isSqlInOrderByValid(orderBy)">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	<resultMap id="SyscomuserInfoVoResult" type="com.syscom.safeaa.mybatis.vo.SyscomuserInfoVo">
+		<result property="idno" column="IDNO" />
+		<result property="userid" column="UserId" />
+		<result property="logonid" column="LogOnId" />
+		<result property="empid" column="EMPID" />
+		<result property="employeeid" column="EmployeeId" />
+		<result property="username" column="UserName" />
+		<result property="emailaddress" column="EmailAddress" />
+		<result property="birthday" column="Birthday" />
+		<result property="sscode" column="SSCODE" />
+		<result property="sscodesalt" column="SSCODESalt" />
+		<result property="islogon" column="IsLogOn" />
+		<result property="islockout" column="IsLockout" />
+		<result property="sscodeerrorcount" column="SSCODEErrorCount" />
+		<result property="sscodeformat" column="SSCODEFormat" />
+		<result property="failedpswansattemptcount" column="FailedPswAnsAttemptCount" />
+	</resultMap>
+	<select id="getSyscomuserInfo" parameterType="String" resultMap="SyscomuserInfoVoResult">
+		SELECT
+		a.IDNO,
+		a.UserId,
+		a.LogOnId,
+		a.EMPID,
+		a.EmployeeId,
+		a.UserName,
+		a.EmailAddress,
+		a.Birthday,
+		b.SSCODE,
+		b.SSCODESalt,
+		b.IsLogOn,
+		b.IsLockout,
+		b.SSCODEErrorCount,
+		b.SSCODEFormat,
+		b.FailedPswAnsAttemptCount
+		FROM
+		SyscomUser a INNER JOIN SyscomUserStatus b ON a.UserId = b.UserId
+		<where>
+			<if test="logOnId != null and logOnId != ''">
+				AND a.LogOnId = #{logOnId}
+			</if>
+		</where>
+	</select>
+	<resultMap id="SyscomresourceInfoVoResult" type="com.syscom.safeaa.mybatis.vo.SyscomresourceInfoVo">
+		<result property="userid" column="USERID" />
+		<result property="logonid" column="LOGONID" />
+		<result property="username" column="USERNAME" />
+		<result property="roleid" column="ROLEID" />
+		<result property="rolename" column="ROLENAME" />
+		<result property="resourceid" column="RESOURCEID" />
+		<result property="resourcename" column="RESOURCENAME" />
+		<result property="resourceurl" column="RESOURCEURL" />
+		<result property="resourceno" column="RESOURCEPNO" />
+		<result property="resourcepid" column="RESOURCEPID" />
+	</resultMap>
+	<select id="querySyscomresourceByLogOnId" parameterType="String" resultMap="SyscomresourceInfoVoResult">
+		SELECT * FROM (
+		SELECT
+		USR.USERID, -- 使用者ID
+		USR.LOGONID, -- 登錄ID
+		USR.USERNAME, -- 使用者名
+		SRM.ROLEID, -- 角色ID
+		SRC.ROLENAME, -- 角色名
+		0 AS RESOURCEPID, -- MENU父ID
+		NULL AS RESOURCEPNO, -- MENUNO
+		SRG.GROUPID AS RESOURCEID, -- MENUID
+		SGC.GROUPNAME AS RESOURCENAME, -- MENU名
+		SG.GROUPURL AS RESOURCEURL, -- MENUURL
+		SG.LOCATIONNO AS LOCATIONNOG ,
+		0 AS LOCATIONNOR
+		FROM
+		SYSCOMUSER USR
+		INNER JOIN SYSCOMUSERSTATUS STA ON STA.USERID = USR.USERID
+		LEFT JOIN SYSCOMROLEMEMBERS SRM ON SRM.CHILDID = USR.USERID AND SRM.CHILDTYPE = 'U'
+		LEFT JOIN SYSCOMROLECULTURE SRC ON SRC.ROLEID = SRM.ROLEID
+		LEFT JOIN SYSCOMROLEGROUP SRG ON SRG.ROLEID = SRM.ROLEID
+		LEFT JOIN SYSCOMGROUP SG ON SG.GROUPID = SRG.GROUPID
+		LEFT JOIN SYSCOMGROUPCULTURE SGC ON SGC.GROUPID = SRG.GROUPID
+		WHERE
+		USR.LOGONID = #{logOnId} AND NOT SRG.GROUPID IS NULL
+		UNION
+		SELECT
+		USR.USERID, -- 使用者ID
+		USR.LOGONID, -- 登錄ID
+		USR.USERNAME, -- 使用者名
+		SRM.ROLEID, -- 角色ID
+		SRC.ROLENAME, -- 角色名
+		SGM.GROUPID AS RESOURCEPID, -- MENU父ID
+		SS.RESOURCENO, -- MENUNO
+		SRR.RESOURCEID , -- MENUID
+		SGC.RESOURCENAME , -- MENU名
+		SS.RESOURCEURL, -- MENUURL
+		99999 AS LOCATIONNOG,
+		SGM.LOCATIONNO AS LOCATIONNOR
+		FROM
+		SYSCOMUSER USR
+		INNER JOIN SYSCOMUSERSTATUS STA ON STA.USERID = USR.USERID
+		LEFT JOIN SYSCOMROLEMEMBERS SRM ON SRM.CHILDID = USR.USERID AND SRM.CHILDTYPE = 'U'
+		LEFT JOIN SYSCOMROLECULTURE SRC ON SRC.ROLEID = SRM.ROLEID
+		LEFT JOIN SYSCOMROLERESOURCE SRR ON SRR.ROLEID = SRM.ROLEID
+		LEFT JOIN SYSCOMRESOURCE SS ON SS.RESOURCEID = SRR.RESOURCEID
+		LEFT JOIN SYSCOMRESOURCECULTURE SGC ON SGC.RESOURCEID = SRR.RESOURCEID
+		LEFT JOIN SYSCOMGROUPMEMBERS SGM ON SGM.CHILDID = SRR.RESOURCEID
+		WHERE
+		USR.LOGONID = #{logOnId} AND NOT SRR.RESOURCEID IS NULL
+		)
+		ORDER BY LOCATIONNOG, LOCATIONNOR
+	</select>
+	<select id="queryUserAndGroup" parameterType="String" resultMap="SyscomGroupVoResult">
+		SELECT u.USERID, u.LOGONID, u.USERNAME, sr.ROLEID, sr.ROLENO, cul.ROLENAME 
+		FROM SYSCOMUSER u
+		LEFT JOIN SYSCOMROLEMEMBERS rm
+		ON u.USERID = rm.CHILDID 
+		LEFT JOIN SYSCOMROLE sr
+		ON rm.ROLEID = sr.ROLEID 
+		left join SYSCOMROLECULTURE cul
+		on cul.ROLEID = sr.ROLEID
+		WHERE USERID = #{userId}
+		ORDER BY u.USERID;
+	</select>
+	<resultMap id="SyscomGroupVoResult" type="com.syscom.safeaa.mybatis.vo.SyscomGroupVo">
+		<result property="userId" column="USERID" />
+		<result property="logonId" column="LOGONID" />
+		<result property="userName" column="USERNAME" />
+		<result property="roleId" column="ROLEID" />
+		<result property="roleNo" column="ROLENO" />
+		<result property="roleName" column="ROLENAME" />
+	</resultMap>
+</mapper> 

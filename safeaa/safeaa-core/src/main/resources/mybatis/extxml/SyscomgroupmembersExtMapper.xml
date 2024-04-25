@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomgroupmembersExtMapper">
+	<resultMap id="GroupMemeberAndGroupLevelResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomgroupmembersAndGroupLevel">
+		<id property="groupid" column="GROUPID" javaType="java.lang.Integer" />
+		<result property="childid" column="CHILDID" javaType="java.lang.Integer" />
+		<result property="childtype" column="CHILDTYPE" javaType="java.lang.String" />
+		<result property="childno" column="CHILDNO" javaType="java.lang.String" />
+		<result property="childname" column="CHILDNAME" javaType="java.lang.String" />
+		<result property="remark" column="REMARK" javaType="java.lang.String" />
+		<result property="locationno" column="LOCATIONNO" javaType="java.lang.Integer" />
+		<result property="grouplevel" column="GROUPLEVEL" javaType="java.lang.Integer" />
+		<result property="url" column="URL" javaType="java.lang.String" />
+		<result property="safedefinefunctionlist" column="SAFEDEFINEFUNCTIONLIST" javaType="java.lang.String" />
+		<result property="userdefinefunctionlist" column="USERDEFINEFUNCTIONLIST" javaType="java.lang.String" />
+	</resultMap>
+	<select id="queryNestedMembersByGroupId" parameterType="map" resultMap="GroupMemeberAndGroupLevelResultMap">
+		WITH DirectReports(GroupId, ChildId, ChildType, LocationNo, GroupLevel)
+		AS
+		( SELECT GroupId, ChildId , ChildType, LocationNo, GroupLevel + 1 as GroupLevel FROM
+		(
+		
+WITH RPL (GroupId, ChildId , ChildType, LocationNo,EffectDate,ExpiredDate, GroupLevel) AS (
+	SELECT GroupId, ChildId , ChildType, LocationNo,EffectDate,ExpiredDate, 1 as GroupLevel
+	FROM SyscomGroupMembers WHERE GroupId = #{groupid} AND ChildType = 'G'
+	UNION ALL 
+	SELECT CHILD.GroupId, CHILD.ChildId, CHILD.ChildType,CHILD.LocationNo,CHILD.EffectDate,CHILD.ExpiredDate, 1 as GroupLevel
+	FROM RPL PARENT, SyscomGroupMembers CHILD
+	WHERE PARENT.ChildId = CHILD.GroupId
+)
+SELECT * FROM RPL			
+		
+		
+		)
+		WHERE SYSDATE BETWEEN EffectDate AND ExpiredDate )
+		SELECT a.GroupId, a.ChildId, g.GroupNo AS ChildNo, ec.GroupName AS ChildName, ec.Remark AS Remark,
+		a.ChildType, a.LocationNo, a.GroupLevel, g.GroupURL AS URL,
+		'' AS SafeDefineFunctionList, '' AS UserDefineFunctionList
+		FROM DirectReports a,SyscomGroup g,SyscomGroupCulture ec
+		WHERE a.ChildId = g.GroupId AND g.GroupId = ec.GroupId AND ec.Culture = #{culture,jdbcType=CHAR}
+		UNION
+		SELECT g.GroupId, g.ChildId, r.ResourceNo AS ChildNo, rc.ResourceName AS ChildName, rc.Remark AS Remark,
+		g.ChildType, g.LocationNo, 99 AS GroupLevel, r.ResourceURL AS URL,
+		r.SafeDefineFunctionList, r.UserDefineFunctionList
+		FROM SyscomGroupMembers g,SyscomResource r,SyscomResourceCulture rc
+		WHERE g.ChildId = r.ResourceId AND r.ResourceId = rc.ResourceId
+		AND g.GroupId = GroupId AND g.ChildType = 'R'
+		AND rc.Culture = #{culture,jdbcType=CHAR}
+		AND SYSDATE BETWEEN g.EffectDate AND g.ExpiredDate
+		ORDER BY GroupLevel,GroupId,ChildType,LocationNo
+	</select>
+	<resultMap id="GroupMemeberWithNameResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomgroupmembersAndGroupLevel">
+		<id property="groupid" column="GROUPID" javaType="java.lang.Integer" />
+		<result property="childid" column="CHILDID" javaType="java.lang.Integer" />
+		<result property="childtype" column="CHILDTYPE" javaType="java.lang.String" />
+		<result property="childno" column="CHILDNO" javaType="java.lang.String" />
+		<result property="childname" column="NAME" javaType="java.lang.String" />
+		<result property="locationno" column="LOCATIONNO" javaType="java.lang.Integer" />
+		<result property="effectdate" column="EFFECTDATE" javaType="java.util.Date" />
+		<result property="expireddate" column="EXPIREDDATE" javaType="java.util.Date" />
+	</resultMap>
+	<select id="querySelectedByGroupId" parameterType="map" resultMap="GroupMemeberWithNameResultMap">
+		SELECT a.GroupId, a.ChildId, a.ChildType, b.GroupNo as ChildNo,NVL(c.GroupName,'') as Name,a.LocationNo, a.EffectDate, a.ExpiredDate
+		FROM SyscomGroupMembers a,SyscomGroup b,SyscomGroupCulture c
+		WHERE a.ChildId = b.GroupId AND b.GroupId = c.GroupId(+) AND (a.GroupId = #{groupid}) AND (a.ChildType = 'G') AND (c.Culture is null or c.Culture = #{culture,jdbcType=CHAR})
+		AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+		UNION
+		SELECT a.GroupId, a.ChildId, a.ChildType, b.ResourceNo as ChildNo,NVL(c.ResourceName,'') as Name,a.LocationNo, a.EffectDate, a.ExpiredDate
+		FROM SyscomGroupMembers a,SyscomResource b,SyscomResourceCulture c WHERE a.ChildId = b.ResourceId
+		AND b.ResourceId = c.ResourceId(+) AND (c.Culture is null or c.Culture = #{culture,jdbcType=CHAR}) AND (a.GroupId = #{groupid}) AND (a.ChildType = 'R')
+		AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+	</select>
+	<select id="queryUNSelectMembers" parameterType="map" resultMap="GroupMemeberWithNameResultMap">
+		WITH ParentGroup
+		AS (
+		SELECT GroupId FROM
+		(
+	            WITH RPL (GroupId,ChildId,ChildType,EffectDate,ExpiredDate) AS (
+	                SELECT GroupId,ChildId,ChildType,EffectDate,ExpiredDate
+	                FROM SyscomGroupMembers WHERE ChildType = 'G' AND ChildId = #{groupid}
+	                UNION ALL 
+	                SELECT CHILD.GroupId, CHILD.ChildId, CHILD.ChildType,CHILD.EffectDate,CHILD.ExpiredDate
+	                FROM RPL PARENT, SyscomGroupMembers CHILD
+	                WHERE PARENT.GroupId = CHILD.ChildId
+	            )
+	            SELECT * FROM RPL
+		)
+		WHERE ChildType = 'G' AND SYSDATE BETWEEN EffectDate AND ExpiredDate)
+		SELECT ${groupid} AS GroupId, a.GroupId AS ChildId, 'G' AS ChildType, a.GroupNo AS ChildNo,
+		b.GroupName AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomGroup a,(SELECT GroupId,GroupName FROM SyscomGroupCulture WHERE GroupId != #{groupid} AND Culture = #{culture}
+		AND GroupId not in ( SELECT DISTINCT GroupId FROM ParentGroup )) b
+		LEFT JOIN (SELECT GroupId,childid FROM SyscomGroupMembers WHERE ChildType = 'G' AND GroupId = #{groupid}) c ON a.GroupId = c.childid
+		WHERE a.GroupId = b.GroupId AND c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+		UNION
+		SELECT ${groupid} AS GroupId, a.ResourceId AS ChildId, 'R' AS ChildType, a.ResourceNo AS ChildNo,
+		NVL(b.ResourceName,'') AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomResource a
+		LEFT JOIN (SELECT ResourceId,ResourceName FROM SyscomResourceCulture WHERE Culture = #{culture}) b ON a.ResourceId = b.ResourceId
+		LEFT JOIN (SELECT ChildId FROM SyscomGroupMembers WHERE ChildType = 'R' AND GroupId = #{groupid}) c ON a.ResourceId = c.ChildId
+		WHERE c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+		ORDER BY ChildType, ChildId
+	</select>
+	<delete id="deleteAllByGroupId" parameterType="map">
+		delete from SYSCOMGROUPMEMBERS
+		where GROUPID = #{groupid,jdbcType=INTEGER}
+	</delete>
+
+	<select id="getMaxLocationno" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT MAX(LOCATIONNO) FROM SYSCOMGROUPMEMBERS WHERE GROUPID = #{groupid}
+	</select>
+
+	<delete id="deleteAllByResourceId" parameterType="map">
+		delete from SYSCOMGROUPMEMBERS
+		where CHILDID = #{resourceid,jdbcType=INTEGER} AND CHILDTYPE ='R'
+	</delete>
+
+
+</mapper>

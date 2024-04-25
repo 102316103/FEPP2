@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomrolemembersExtMapper">
+	<delete id="deleteAllByRoleId" parameterType="map">
+		delete from SYSCOMROLEMEMBERS
+		where ROLEID = #{roleid,jdbcType=DECIMAL}
+	</delete>
+	<resultMap id="RoleMembersAndCultureResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomrolemembersAndCulture">
+		<result property="roleid" column="ROLEID" javaType="java.lang.Integer" />
+		<result property="childid" column="CHILDID" javaType="java.lang.Integer" />
+		<result property="childtype" column="CHILDTYPE" javaType="java.lang.String" />
+		<result property="roleno" column="ROLENO" javaType="java.lang.String" />
+		<result property="rolename" column="ROLENAME" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result property="effectdate" column="EFFECTDATE" javaType="java.util.Date" />
+		<result property="expireddate" column="EXPIREDDATE" javaType="java.util.Date" />
+	</resultMap>
+	<select id="querySelectedByRoleId" parameterType="map" resultMap="RoleMembersAndCultureResultMap">
+		SELECT a.RoleId, a.ChildId, a.ChildType, b.RoleNo as ChildNo, c.RoleName as Name,a.EffectDate, a.ExpiredDate
+		FROM SyscomRoleMembers a
+		inner join SyscomRole b on a.ChildId = b.RoleId
+		inner join SyscomRoleCulture c on b.RoleId = c.RoleId
+		Left Join SyscomUser d on d.UserID = a.ChildID
+		WHERE (a.RoleId = #{roleid}) AND (a.ChildType = 'R') AND (c.Culture = #{culture})
+		AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+		UNION
+		SELECT a.RoleId, a.ChildId, a.ChildType, b.LogOnId as ChildNo, b.UserName as Name,a.EffectDate, a.ExpiredDate
+		FROM SyscomRoleMembers a
+		inner join SyscomUser b on a.ChildId = b.UserId
+		WHERE (a.RoleId = #{roleid}) AND (a.ChildType = 'U')
+	</select>
+	<resultMap id="ShortRoleMembersResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomrolemembersAndCulture">
+		<result property="roleid" column="ROLEID" javaType="java.lang.Integer" />
+		<result property="roleno" column="ROLENO" javaType="java.lang.String" />
+		<result property="rolename" column="ROLENAME" javaType="java.lang.String" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="queryParentRolesByUserId" parameterType="map" resultMap="ShortRoleMembersResultMap">
+		WITH DirectReports
+		AS
+		( SELECT RoleId, ChildId, childtype
+		FROM SyscomRoleMembers
+		WHERE ChildId = #{userid} AND ChildType = 'U'
+		UNION ALL
+		SELECT RoleId, ChildId, childtype FROM
+		(
+			WITH RPL (RoleId, ChildId, childtype,EffectDate,ExpiredDate) AS (
+				SELECT RoleId, ChildId, childtype,EffectDate,ExpiredDate
+				FROM SyscomRoleMembers WHERE ChildType = 'U' AND ChildId = #{userid}
+				UNION ALL 
+				SELECT CHILD.RoleId, CHILD.ChildId, CHILD.childtype,CHILD.EffectDate,CHILD.ExpiredDate
+				FROM RPL PARENT, SyscomRoleMembers CHILD
+				WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL
+		)
+		WHERE ChildType = 'R' AND SYSDATE BETWEEN EffectDate AND ExpiredDate)
+		SELECT DISTINCT r.RoleNo, rc.RoleName, dr.RoleId
+		FROM DirectReports dr,SyscomRole r,SyscomRoleCulture rc
+		WHERE dr.RoleId = r.RoleId AND SYSDATE BETWEEN r.EffectDate AND r.ExpiredDate
+		AND dr.RoleId = rc.RoleId AND rc.Culture = #{culture}
+	</select>
+	<resultMap id="RoleMembersUserResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomrolemembersAndCulture">
+		<result property="roleid" column="ROLEID" javaType="java.lang.Integer" />
+		<result property="userid" column="USERID" javaType="java.lang.Integer" />
+		<result property="childtype" column="CHILDTYPE" javaType="java.lang.String" />
+		<result property="logonid" column="LOGONID" javaType="java.lang.String" />
+		<result property="username" column="USERNAME" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result property="effectdate" column="EFFECTDATE" javaType="java.util.Date" />
+		<result property="expireddate" column="EXPIREDDATE" javaType="java.util.Date" />
+	</resultMap>
+	<select id="queryRoleUsersByRoleId" parameterType="map" resultMap="RoleMembersUserResultMap">
+		SELECT a.RoleId, b.UserId, a.ChildType, b.LogOnId, b.UserName,
+		a.EffectDate, a.ExpiredDate
+		FROM SyscomRoleMembers a, SyscomUser b
+		WHERE a.ChildId = b.UserId AND a.RoleId = #{roleid} AND a.ChildType = 'U'
+		AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+	</select>
+	<resultMap id="RoleMembersUserResultMap1" type="com.syscom.safeaa.mybatis.vo.SyscomrolemembersAndCulture">
+		<result property="roleid" column="ROLEID" javaType="java.lang.Integer" />
+		<result property="childid" column="CHILDID" javaType="java.lang.Integer" />
+		<result property="childtype" column="CHILDTYPE" javaType="java.lang.String" />
+		<result property="roleno" column="CHILDNO" javaType="java.lang.String" />
+		<result property="username" column="NAME" javaType="java.lang.String" jdbcType="VARCHAR" />
+		<result property="effectdate" column="EFFECTDATE" javaType="java.util.Date" />
+		<result property="expireddate" column="EXPIREDDATE" javaType="java.util.Date" />
+	</resultMap>
+	<select id="queryUNSelectMembers" parameterType="map" resultMap="RoleMembersUserResultMap1">
+		WITH ParentRole AS (
+			WITH RPL (RoleId,ChildType,ChildId,EffectDate,ExpiredDate) AS (
+			    SELECT RoleId,ChildType,ChildId,EffectDate,ExpiredDate
+			    FROM SyscomRoleMembers WHERE ChildType = 'R' AND ChildId = #{roleid} AND SYSDATE BETWEEN EffectDate AND ExpiredDate
+			    UNION ALL 
+			    SELECT CHILD.RoleId, CHILD.ChildType, CHILD.ChildId,CHILD.EffectDate,CHILD.ExpiredDate
+			    FROM RPL PARENT, SyscomRoleMembers CHILD
+			    WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL
+		)
+		SELECT ${roleid} AS RoleId, a.RoleId AS ChildId, 'R' AS ChildType, a.RoleNo AS ChildNo,
+		b.RoleName AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomRole a
+		inner join SyscomRoleMembers c on c.ChildId = a.RoleId
+		inner join SyscomRoleCulture b on b.RoleId = c.RoleId
+		Left Join SyscomUser d on d.UserID = c.ChildID
+		WHERE a.RoleId = b.RoleId AND (a.RoleId != #{roleid})
+		AND (b.Culture = #{culture}) AND a.RoleId not in ( SELECT DISTINCT RoleId FROM ParentRole )
+		AND a.RoleType = (select RoleType FROM SyscomRole WHERE RoleId = #{roleid})
+		AND a.RoleId = c.childid
+		AND (c.ChildType IS NULL OR c.ChildType = 'R') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+		AND c.ChildId is Null
+		UNION
+		SELECT ${roleid} AS RoleId, a.UserId AS ChildId, 'U' AS ChildType, a.LogOnId AS ChildNo,
+		a.UserName AS Name, a.EffectDate, a.ExpiredDate
+		FROM SyscomUser a
+		left join SyscomRoleMembers c on(a.UserId = c.ChildId AND c.ChildType = 'U' AND c.RoleId = #{roleid})
+		WHERE c.ChildId is Null
+		ORDER BY ChildId
+	</select>
+</mapper>

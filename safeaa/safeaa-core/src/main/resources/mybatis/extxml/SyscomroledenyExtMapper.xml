@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomroledenyExtMapper">
+	<resultMap id="RoleMemberSelectedResultMap" type="com.syscom.safeaa.mybatis.model.Syscomrolemembers">
+		<id property="roleid" column="ROLEID" />
+		<result property="childid" column="CHILDID" />
+		<result property="childtype" column="CHILDTYPE" />
+	</resultMap>
+	<select id="queryDenyGroupsByUserId" parameterType="map" resultMap="RoleMemberSelectedResultMap">
+		WITH DirectReports
+		AS
+		( SELECT RoleId, ChildId, ChildType
+		FROM SyscomRoleMembers
+		WHERE ChildId = #{userid} AND ChildType = 'U'
+		UNION ALL
+		SELECT RoleId, ChildId, ChildType FROM
+		(
+			WITH RPL (RoleId, ChildId, childtype,EffectDate,ExpiredDate) AS (
+				SELECT RoleId, ChildId, childtype,EffectDate,ExpiredDate
+				FROM SyscomRoleMembers WHERE ChildType = 'U' AND ChildId = #{userid}
+				UNION ALL 
+				SELECT CHILD.RoleId, CHILD.ChildId, CHILD.childtype,CHILD.EffectDate,CHILD.ExpiredDate
+				FROM RPL PARENT, SyscomRoleMembers CHILD
+				WHERE PARENT.RoleId = CHILD.ChildId
+			)
+			SELECT * FROM RPL		
+		)
+		WHERE ChildType = 'R' AND SYSDATE BETWEEN EffectDate AND ExpiredDate )
+		SELECT DISTINCT dr.RoleId, rd.ChildId, rd.ChildType
+		FROM DirectReports dr,(SELECT RoleId FROM SyscomRole WHERE SYSDATE BETWEEN EffectDate AND ExpiredDate) r,SyscomRoleDeny rd
+		WHERE dr.RoleId = r.RoleId AND dr.RoleId = rd.RoleId
+		ORDER BY ChildType, ChildId
+	</select>
+	<resultMap id="RoleGroupWithCultureAndRemarkResultMap" type="com.syscom.safeaa.mybatis.vo.SyscomrolegroupAndCulture">
+		<id property="roleid" column="ROLEID" />
+		<result property="childid" column="CHILDID" />
+		<result property="childtype" column="CHILDTYPE" />
+		<result property="groupno" column="GROUPNO" />
+		<result property="effectdate" column="EFFECTDATE" />
+		<result property="expireddate" column="EXPIREDDATE" />
+		<result property="groupname" column="GROUPNAME" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+	<select id="querySelectedRoleDenyByRoleId" parameterType="map" resultMap="RoleGroupWithCultureAndRemarkResultMap">
+		<if test="childtype == 'A'.toString()">
+			SELECT a.RoleId, a.ChildId, a.ChildType, b.GroupNo as ChildNo,
+			b.EffectDate, b.ExpiredDate, c.Culture, c.GroupName as Name, c.Remark
+			FROM SyscomRoleDeny a,SyscomGroup b,SyscomGroupCulture c
+			WHERE a.ChildId = b.GroupId AND b.GroupId = c.GroupId AND (a.RoleId = #{roleid}) AND (a.ChildType = 'G') AND (c.Culture = #{culture,jdbcType=CHAR})
+			AND (SYSDATE BETWEEN b.EffectDate AND b.ExpiredDate)
+			UNION
+			SELECT a.RoleId, a.ChildId, a.ChildType, b.ResourceNo as ChildNo,
+			b.EffectDate, b.ExpiredDate, c.Culture, c.ResourceName as Name, c.Remark
+			FROM SyscomRoleDeny a,SyscomResource b,SyscomResourceCulture c
+			WHERE a.ChildId = b.ResourceId AND b.ResourceId = c.ResourceId AND (a.RoleId = #{roleid}) AND (a.ChildType = 'R') AND (c.Culture = #{culture,jdbcType=CHAR})
+			AND (SYSDATE BETWEEN b.EffectDate AND b.ExpiredDate)
+		</if>
+		<if test="childtype == 'G'.toString()">
+			SELECT a.RoleId, a.ChildId, a.ChildType, b.GroupNo as ChildNo,
+			b.EffectDate, b.ExpiredDate, c.Culture , c.GroupName as Name, c.Remark
+			FROM SyscomRoleDeny a,SyscomGroup b,SyscomGroupCulture c
+			WHERE a.ChildId = b.GroupId AND b.GroupId = c.GroupId AND (a.RoleId = #{roleid}) AND (a.ChildType = 'G') AND (c.Culture = #{culture,jdbcType=CHAR})
+			AND (SYSDATE BETWEEN b.EffectDate AND b.ExpiredDate)
+			ORDER by b.GroupNo
+		</if>
+		<if test="childtype == 'R'.toString()">
+			SELECT a.RoleId, a.ChildId, a.ChildType, b.ResourceNo as ChildNo,
+			b.EffectDate, b.ExpiredDate, c.Culture, c.ResourceName as Name, c.Remark
+			FROM SyscomRoleDeny a,SyscomResource b,SyscomResourceCulture c
+			WHERE a.ChildId = b.ResourceId AND b.ResourceId = c.ResourceId AND
+			(a.RoleId = #{roleid}) AND (a.ChildType = 'R') AND (c.Culture = #{culture,jdbcType=CHAR})
+			AND (SYSDATE BETWEEN b.EffectDate AND b.ExpiredDate)
+			ORDER by b.ResourceNo
+		</if>
+	</select>
+	<select id="queryUNSelectRoleDenyByRoleId" parameterType="map" resultMap="RoleGroupWithCultureAndRemarkResultMap">
+		<if test="childtype == 'A'.toString()">
+			SELECT a.GroupId as ChildId, 'G' AS ChildType, a.GroupNo AS ChildNo,
+			a.EffectDate, a.ExpiredDate, b.Culture, b.GroupName AS Name, b.Remark
+			FROM SyscomGroup a,SyscomGroupCulture b,SyscomRoleDeny c
+			WHERE a.GroupId = b.GroupId AND (b.Culture = #{culture,jdbcType=CHAR})
+			AND a.GroupId = c.ChildId(+) AND (c.ChildType IS NULL OR c.ChildType = 'G') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+			AND c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate)
+			UNION
+			SELECT a.ResourceId as ChildId, 'R' AS ChildType, a.ResourceNo AS ChildNo,
+			a.EffectDate, a.ExpiredDate, b.Culture, b.ResourceName AS Name, b.Remark
+			FROM SyscomResource a,SyscomResourceCulture b,SyscomRoleDeny c
+			WHERE a.ResourceId = b.ResourceId AND (b.Culture = #{culture,jdbcType=CHAR})
+			AND a.ResourceId = c.ChildId(+) AND (c.ChildType IS NULL OR c.ChildType = 'R') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+			AND c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate);
+		</if>
+		<if test="childtype == 'G'.toString()">
+			SELECT a.GroupId as ChildId, 'G' AS ChildType, a.GroupNo AS ChildNo,
+			a.EffectDate, a.ExpiredDate, b.Culture, b.GroupName AS Name, b.Remark
+			FROM SyscomGroup a,SyscomGroupCulture b,SyscomRoleDeny c
+			WHERE a.GroupId = b.GroupId AND (b.Culture = #{culture,jdbcType=CHAR}) AND a.GroupId = c.ChildId(+)
+			AND (c.ChildType IS NULL OR c.ChildType = 'G') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+			AND c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate);
+		</if>
+		<if test="childtype == 'R'.toString()">
+			SELECT a.ResourceId as ChildId, 'R' AS ChildType, a.ResourceNo AS ChildNo,
+			a.EffectDate, a.ExpiredDate, b.Culture, b.ResourceName AS Name, b.Remark
+			FROM SyscomResource a,SyscomResourceCulture b,SyscomRoleDeny c
+			WHERE a.ResourceId = b.ResourceId AND (b.Culture = #{culture,jdbcType=CHAR})
+			AND a.ResourceId = c.ChildId(+) AND (c.ChildType IS NULL OR c.ChildType = 'R') AND (c.RoleId IS NULL OR c.RoleId = #{roleid})
+			AND c.ChildId is Null AND (SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate) ;
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,169 @@
+#include "suip.h"
+#include "hsmapi.h"
+/*-------------------------------------------------------------------------------------------------*/
+/*  FUNCTION CODE FN000901 : Translate PPK key, 轉換PPK Key, 驗證PPKSync, 轉換MAC Key, 驗證MACSync  */
+/*-------------------------------------------------------------------------------------------------*/
+/*
+ Translate PPK/MAC key,：
+
+DES_LIB("FN000901"，"1S1PPK ATM   "+ATM_ID"，"詳: Input_data_1"，"N/A"，Return_data_1，Return_data_2，Return_Code)
+Input Parameters:
+key_identify =1T3PPK ATM   "+ATM_ID
+Input_data_1：
+
+(single DES)
+Input_data_1="0032"+新PPKkey(H16)+新KeySyncCheckValue(H16)
+Input_data_2="0032"+新MACkey(H16)+新KeySyncCheckValue(H16)
+Return_data_2=N/A
+(3_DES 2_length)
+Input_data_1="0048"+新PPKkey(H32)+新KeySyncCheckValue(H16)
+Input_data_2="0048"+新MACkey(H32)+新KeySyncCheckValue(H16)
+(3_DES 3_length)
+Input_data_1="0064"+新PPKkey(H48)+新KeySyncCheckValue(H16)
+Input_data_2="0064"+新MACkey(H48)+新KeySyncCheckValue(H16)
+*/
+typedef	struct	{
+	char	cmd[2] ;
+	char	lmkpair[2] ;
+	char    zmksz ;
+	char	zmk[48] ;
+	char    zmkeysz ;
+	char	zmkey[48] ;
+	char	numn[16] ;
+	char	data1[16] ;
+	char	data2[16] ;
+}	CMDxSC ;
+
+typedef	struct	{
+	char	cmd[2] ;
+	char	error[2] ;
+	char    ksz ;
+	char	lmkey[48] ;
+	char	numn1[16] ;
+	char	numn2[16] ;
+	char	mab1[16] ;
+	char	mab2[16] ;
+	char	delim[2] ;
+}	CMDxSD ;
+
+typedef struct	{
+	char	f ;					/* FUNCTION CODE */
+	char	atmid[8] ;
+	char    atmkey[48] ;
+	char    rmtkey[32] ;
+	char    len1[4] ;
+	char    input1[64] ;
+	char    len2[4] ;
+	char    input2[64] ;
+}	fn901i_t, *pfn901i_t ;
+
+typedef struct	{
+	int 	rc ;
+	char    tpk[48] ;
+	char    tak[48] ;
+}	fn901o_t, *pfn901o_t ;
+
+int fn901( char* out, char* in ) 
+{
+   char cmds[512], lmkey[50], AtmID[10], pkcv[20], mkcv[20] ;
+   pfn901i_t i901 = (pfn901i_t) in ;
+   pfn901o_t o901 = (pfn901o_t) out ;
+
+   CMDIA *hc = (CMDIA *) cmds ;
+   CMDIB *hd = (CMDIB *) cmds ;
+
+   CMDxSC *sc = (CMDxSC *) cmds ;
+   CMDxSD *sd = (CMDxSD *) cmds ;
+
+   memset( AtmID, 0, sizeof(AtmID) ) ;
+   memset( lmkey, 0, sizeof(lmkey) ) ;
+   memset( pkcv, 0, sizeof(pkcv) ) ;
+   memset( mkcv, 0, sizeof(mkcv) ) ;
+
+   memcpy( pkcv, i901->input1+48, 16) ;
+   memcpy( mkcv, i901->input2+48, 16) ;
+
+   memcpy( AtmID, i901->atmid, 8 ) ;
+   
+   memset( cmds, 0, sizeof(cmds) ) ; /* TMK Translate to ZMK */ 
+   memcpy( hc->cmd, "FE", 2 ) ;
+   memcpy( hc->kek, "U", 1 ) ;
+   memcpy( hc->kek+1, i901->rmtkey, 32 ) ;    /*  Read From Where FISC */ 
+   memcpy( hc->kek+33, "T", 1 ) ;    
+   memcpy( hc->kek+34, i901->atmkey, 48 ) ;
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   if( o901->rc = hsmio(cmds, 0) ){
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+	   return( o901->rc ) ;
+   }
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   memcpy( lmkey, hd->kekey, 49 ) ;
+
+   memset( cmds, 0, sizeof(cmds) ) ; /* ZMK to LMK */ 
+   memcpy( hc->cmd, "BY", 2 ) ;
+   memcpy( hc->kek, "U", 1 ) ;
+   memcpy( hc->kek+1, i901->rmtkey, 32 ) ;    /*  Read From Where FISC */ 
+   memcpy( hc->kek+33, lmkey, 49 ) ;    
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   if( o901->rc = hsmio(cmds, 0) ){
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+	   return( o901->rc ) ;
+   }
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   memcpy( lmkey, hd->kekey+1, 48 ) ;
+
+   memset( cmds, 0, sizeof(cmds) ) ;
+   memcpy( sc->cmd, "SC", 2 ) ;
+   memcpy( sc->lmkpair, "14", 2 ) ;
+   sc->zmksz = 'T' ;
+   memcpy( sc->zmk, lmkey, 48 ) ;
+   sc->zmkeysz = 'Y' ;
+   memcpy( sc->zmkey, i901->input1, 48) ;
+   memset( sc->numn, '0', 48 ) ;
+   memcpy( sc->data1, AtmID+3, 5 ) ;
+
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   if( o901->rc = hsmio(cmds, 0) ){
+       HSMLogMSG( "FN000901;", cmds, NULL ) ;
+	   return( o901->rc ) ;
+   }
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+
+/*  verify TPK SYNC */ 
+
+   if( memcmp( sd->mab1, pkcv, 16 ) ) {
+       o901->rc = 103 ;
+       return( o901->rc ) ;
+   }
+   memcpy(o901->tpk, sd->lmkey, 48 ) ;
+
+
+   memset( cmds, 0, sizeof(cmds) ) ;
+   memcpy( sc->cmd, "SC", 2 ) ;
+   memcpy( sc->lmkpair, "14", 2 ) ;
+   sc->zmksz = 'T' ;
+   memcpy( sc->zmk, lmkey, 48 ) ;
+   sc->zmkeysz = 'Y' ;
+   memcpy( sc->zmkey, i901->input2, 48) ;
+   memset( sc->numn, '0', 48 ) ;
+   memcpy( sc->data1, AtmID+3, 5 ) ;
+
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+   if( o901->rc = hsmio(cmds, 0) ){
+       HSMLogMSG( "FN000901;", cmds, NULL ) ;
+	   return( o901->rc ) ;
+   }
+   HSMLogMSG( "FN000901;", cmds, NULL ) ;
+
+/*  verify MACKEY SYNC */ 
+
+   if( memcmp( sd->mab1, mkcv, 16 ) ) {
+       o901->rc = 104 ;
+       return( o901->rc ) ;
+   }
+
+   memcpy( o901->tak, sd->lmkey, 48 ) ;
+
+   return( o901->rc ) ;
+}
+

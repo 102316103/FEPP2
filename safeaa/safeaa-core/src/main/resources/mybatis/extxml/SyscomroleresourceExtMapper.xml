@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscomroleresourceExtMapper">
+	<delete id="deleteAllByRoleId" parameterType="Integer">
+		delete from SYSCOMROLERESOURCE
+		where ROLEID = #{roleid}
+	</delete>
+	<delete id="deleteAllByResourceId" parameterType="Integer">
+		delete from SYSCOMROLERESOURCE
+		where RESOURCEID = #{resourceid}
+	</delete>
+	<resultMap id="SyscomSelectResourcesVoResult" type="com.syscom.safeaa.mybatis.vo.SyscomSelectResourcesVo">
+		<result column="ROLEID" property="roleid" />
+		<result column="RESOURCEID" property="resourceid" />
+		<result column="RESOURCENO" property="resourceno" />
+		<result column="RESOURCENAME" property="resourcename" />
+		<result column="SAFEDEFINEFUNCTIONLIST" property="safedefinefunctionlist" />
+		<result column="USERDEFINEFUNCTIONLIST" property="userdefinefunctionlist" />
+	</resultMap>
+	<select id="querySelectedResourcesByRoleId" parameterType="map" resultMap="SyscomSelectResourcesVoResult">
+		SELECT
+		a.ROLEID,
+		a.RESOURCEID,
+		a.SAFEDEFINEFUNCTIONLIST,
+		a.USERDEFINEFUNCTIONLIST,
+		b.RESOURCENO,
+		c.RESOURCENAME
+		FROM
+		SYSCOMROLERESOURCE a,
+		SYSCOMRESOURCE b,
+		SYSCOMRESOURCECULTURE c
+		WHERE
+		a.RESOURCEID = b.RESOURCEID
+		AND b.RESOURCEID = c.RESOURCEID
+		AND c.CULTURE = #{culture}
+		AND a.ROLEID = #{roleid}
+	</select>
+	<select id="queryUNSelectResourcesByRoleId" parameterType="map" resultMap="SyscomSelectResourcesVoResult">
+		SELECT
+		c.ROLEID,
+		a.RESOURCEID,
+		a.SAFEDEFINEFUNCTIONLIST,
+		a.USERDEFINEFUNCTIONLIST,
+		a.RESOURCENO,
+		b.RESOURCENAME
+		FROM
+		SYSCOMRESOURCE a,
+		SyscomResourceCulture b
+		LEFT JOIN SYSCOMROLERESOURCE c ON b.RESOURCEID = c.RESOURCEID
+		WHERE
+		a.RESOURCEID = b.RESOURCEID
+		AND c.RESOURCEID IS NULL
+		AND SYSDATE BETWEEN a.EffectDate AND a.ExpiredDate
+		AND ( c.ROLEID IS NULL OR c.ROLEID = #{roleid} )
+		AND ( b.CULTURE = #{culture} )
+	</select>
+</mapper>

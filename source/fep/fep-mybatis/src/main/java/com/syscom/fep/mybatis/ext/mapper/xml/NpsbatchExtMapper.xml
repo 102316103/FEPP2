@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.fep.mybatis.ext.mapper.NpsbatchExtMapper">
+<!--    xy 2021/08/26 add-->
+    <select id="queryNPSBATCH" parameterType="map" resultMap="com.syscom.fep.mybatis.mapper.NpsbatchMapper.BaseResultMap">
+        SELECT * FROM NPSBATCH 
+        <where>
+            <if test="fileid != ''">
+                AND NPSBATCH_FILE_ID = #{fileid,jdbcType=CHAR}
+            </if>
+            <if test="fileid == ''">
+                AND NPSBATCH_FILE_ID != '' AND NPSBATCH_FILE_ID IS NOT NULL 
+            </if>
+            <if test="txdate != ''">
+                AND NPSBATCH_TX_DATE = #{txdate,jdbcType=CHAR}
+            </if>
+        </where>
+        ORDER BY NPSBATCH_BATCH_NO
+    </select>
+</mapper>

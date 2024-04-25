@@ -1,0 +1,2 @@
+Class-Path: commons-lang3-3.12.0.jar 
+Main-Class: com.syscom.fep.suipConnect.ConnectSuipChangeDateAndMakeMac

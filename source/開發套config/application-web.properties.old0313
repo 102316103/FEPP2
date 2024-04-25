@@ -1,0 +1,65 @@
+server.port=8081
+
+spring.fep.application.name=fep-web
+
+management.endpoints.prometheus.enabled=true
+management.endpoints.web.exposure.include=*
+management.metrics.tags.application=${spring.fep.application.name}
+management.endpoint.health.show-details=always
+
+server.servlet.session.tracking-modes=cookie
+spring.thymeleaf.prefix=classpath:/templates/
+
+spring.fep.web.title=\u5408\u4F5C\u91D1\u5EAB\u5546\u696D\u9280\u884C
+spring.fep.web.web-type=FEP
+spring.fep.web.query-only=0
+spring.fep.web.ldap=true
+spring.fep.web.time-out=30000
+spring.fep.web.subsys=1,2,3,4,5,6,7,8,9,10,11,12,13,14
+spring.fep.web.csvSavedPath=/fep/FEP10/csv/
+
+#FEPMQService\u63A5\u6536\u6307\u4EE4\u7684Port
+spring.fep.web.mq.service.port=8161
+#FEPMQService\u63A5\u6536\u7684\u5730\u5740
+spring.fep.web.mq.service.request=/api/CustomCommand
+
+#For LDAP
+spring.fep.web.system.userid=HWAFANG
+spring.fep.web.system.principal=HWAFANG@tcbt.com
+spring.fep.web.system.sscode=Tcb123456
+spring.fep.web.system.webaddress=ldaps://10.0.6.2:636
+spring.fep.web.system.strtemp=dc=tcbt,dc=com
+spring.fep.web.system.username=HWAFANG
+spring.fep.web.system.userinname=HWAFANG
+spring.fep.web.system.chkid=G201450209
+spring.fep.web.system.unitid=0410
+spring.fep.web.system.fileName=fepd.cer
+spring.fep.web.system.filesscode=changeit
+spring.fep.web.system.certificateName=X.509
+spring.fep.web.system.fiddler=fiddler
+
+#APP Monitor
+spring.fep.web.app-mon.ip=${spring.fep.hostip}
+spring.fep.web.app-mon.port=8730
+
+#create log path
+spring.fep.log.path=/fep/waslogs
+
+#log download path
+spring.fep.web.system.download.feplogpath=/fep/logs/
+spring.fep.web.system.download.fepwaslogpath=/fep/waslogs/
+spring.fep.web.system.download.feplogarchivespath=/fep/logs/archives
+
+#AP Log
+spring.fep.web.aplog[0].server=fepap1D
+spring.fep.web.aplog[0].logtype=aplog,waslog
+spring.fep.web.aplog[0].service=http://${spring.fep.hostip}:${server.port}/UI060610/GetAPLog
+#spring.fep.web.aplog[1].server=fepap2T
+#spring.fep.web.aplog[1].logtype=aplog,waslog
+#spring.fep.web.aplog[1].service= http://${spring.fep.hostip}:${server.port}/UI060610/GetAPLog
+spring.fep.web.aplog[1].server=fepgw1D
+spring.fep.web.aplog[1].logtype=aplog
+spring.fep.web.aplog[1].service= http://${spring.fep.hostip}:8302/fepgwagent/GetAPLog
+#spring.fep.web.aplog[3].server=fepgw2T
+#spring.fep.web.aplog[3].logtype=aplog
+#spring.fep.web.aplog[3].service= http://${spring.fep.hostip}:8302/fepgwagent/GetAPLog

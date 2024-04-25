@@ -1,0 +1,25 @@
+CREATE OR REPLACE TRIGGER "HISTORY_HISTORY_SEQ_TRIG"
+  BEFORE INSERT ON "HISTORY"
+  REFERENCING NEW AS "NEW"
+  FOR EACH ROW
+BEGIN
+  DECLARE V_NEWVAL BIGINT DEFAULT 0;
+  DECLARE V_INCVAL BIGINT DEFAULT 0;
+  SELECT NEXTVAL FOR HISTORY_HISTORY_SEQ_SEQ INTO V_NEWVAL FROM SYSIBM.SYSDUMMY1;
+  -- If this is the first time this table have been inserted into (sequence == 1)
+  IF V_NEWVAL = 1 THEN
+    --get the max indentity value from the table
+    SELECT NVL(MAX(HISTORY_SEQ), 0) INTO V_NEWVAL FROM HISTORY;
+    SET V_NEWVAL = V_NEWVAL + 1;
+    --set the sequence to that value
+    FETCH_LOOP :
+    LOOP 
+      IF V_INCVAL >= V_NEWVAL THEN
+        LEAVE FETCH_LOOP;
+      END IF;
+      SELECT NEXTVAL FOR HISTORY_HISTORY_SEQ_SEQ INTO V_INCVAL FROM SYSIBM.SYSDUMMY1;
+     END LOOP FETCH_LOOP;
+  END IF;
+  -- assign the value from the sequence to emulate the identity column
+  SET NEW.HISTORY_SEQ = V_NEWVAL;
+END;

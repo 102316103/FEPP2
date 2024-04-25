@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syscom.safeaa.mybatis.extmapper.SyscompolicycultureExtMapper">
+	<delete id="deleteAllByPolicyId" parameterType="map">
+		delete from SYSCOMPOLICYCULTURE
+		where POLICYID = #{policyId,jdbcType=INTEGER}
+	</delete>
+	<select id="queryAllByPolicyId" parameterType="map" resultMap="com.syscom.safeaa.mybatis.mapper.SyscompolicycultureMapper.BaseResultMap">
+		select
+		<include refid="com.syscom.safeaa.mybatis.mapper.SyscompolicycultureMapper.Base_Column_List" />
+		from SYSCOMPOLICYCULTURE
+		where POLICYID = #{policyId,jdbcType=INTEGER}
+	</select>
+</mapper>
